@@ -25,4 +25,3 @@ request.post('https://slack.com/api/chat.postMessage', data, function (error, re
       res.json();
     });
 });
-//https://tutorials.botsfloor.com/building-a-node-js-slack-bot-before-your-microwave-popcorn-is-ready-8946651a5071
