@@ -32,3 +32,5 @@ request.post('https://slack.com/api/chat.postMessage', data, function (error, re
       res.json();
     });
 });
+
+module.exports = app;
