@@ -3,6 +3,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const request = require("request");
 
+const {
+  logger
+} = require('./logger')
+
 // Creates express app
 const app = express();
 // The port used for Express server
@@ -11,6 +15,9 @@ const PORT = 3000;
 app.listen(process.env.PORT || PORT, function() {
   console.log('Bot is listening on port ' + PORT);
 });
+
+// Log request information
+app.use(logger);
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
