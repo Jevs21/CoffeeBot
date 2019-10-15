@@ -59,7 +59,12 @@ This is the new URL where you will be able to access your server on port 3000 fr
   1. ngrok. Will tell you if everything is correcly connecting
   2. your running bot server. If you are getting connection here, failures are likely in the bot code. 
 
+## Running the SQL setup script
+Ensure **SQLite3** is installed.
 
+`npm run setup`
+
+This will generate a database.db file which is populated with empty tables with the coffee bot's schema.
  
  
  
