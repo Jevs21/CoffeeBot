@@ -7,25 +7,35 @@ const {
   logger
 } = require('./logger');
 
+const coffeeRouter = require('./routes/coffee');
+
 // Creates express app
 const app = express();
+
 // The port used for Express server
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 // Starts server
-app.listen(process.env.PORT || PORT, function () {
+app.listen(PORT, function () {
   console.log('Bot is listening on port ' + PORT);
 });
+
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Log request information
 app.use(logger);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+// coffee API controller
+// All requuests will be forwarded to this router
+app.use('/coffee', coffeeRouter);
+
 app.post('/', (req, res) => {
   const data = {
     form: {
       token: process.env.SLACK_AUTH_TOKEN,
-      channel: "#general",
+      channel: "#bot_madness",
       text: "Hi! :wave: \n I'm your new bot."
     }
   };

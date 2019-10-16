@@ -1,4 +1,5 @@
 database.db
+testdatabase.db
 package-lock.json
 node_modules/
 .env

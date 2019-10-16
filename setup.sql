@@ -1,4 +1,4 @@
-create table drink_preference(
+create table if not exists drink_preference(
     id integer primary key,
     user_id integer not null,
     size text,
@@ -6,20 +6,20 @@ create table drink_preference(
     details text
 );
 
-create table shop_preference(
+create table  if not exists shop_preference(
     id integer primary key,
     user_id integer not null,
     name text not null,
     location text
 );
 
-create table `order`(
+create table  if not exists `order`(
     id integer primary key,
     date text,
     coffee_getter integer not null
 );
 
-create table user_order(
+create table  if not exists user_order(
     user_id integer not null,
     order_id integer not null,
     response integer default 0,
