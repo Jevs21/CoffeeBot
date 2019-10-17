@@ -3,7 +3,8 @@ create table if not exists drink_preference(
     user_id integer not null,
     size text,
     type text,
-    details text
+    details text,
+    created_at datetime default CURRENT_TIMESTAMP
 );
 
 create table  if not exists shop_preference(
