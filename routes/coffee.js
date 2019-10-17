@@ -1,6 +1,9 @@
 const express = require('express');
+
+const db = require('../db');
+
 const router = express.Router();
-const coffeePreference = require('../models/CoffeePreference');
+const CoffeePreference = require('../models/CoffeePreference');
 
 
 // coffee API routes
@@ -32,11 +35,27 @@ router.post('/order-:order_id/respond', (req, res) => {
     res.send('RESPOND AS A USER TO COFFEE ORDER');
 });
 
-router.post('/preference/save', (req, res) => {
-    res.send('SAVE COFFEE PREFERENCES');
+router.post('/preference/save', async (req, res) => {
+    try {
+        // TODO move this somewhere else
+        const userId = req.body.user_id;
+        const newPreferences = req.body.text.split(' ');
+        const size = newPreferences[0];
+        const type = newPreferences[1];
+        const details = newPreferences[2];
+
+        const preference = new CoffeePreference(userId)
+        await preference.savePreferences(size, type, details);
+
+
+        res.send(`Saved preference:\n ${preference.toSlackStr()}`);
+    } catch (err) {
+        console.warn(err);
+        res.status(422).send('INVALID INPUT');
+    }
 });
 
-router.post('/shop/save', (req, res) =>{
+router.post('/shop/save', (req, res) => {
     res.send('SAVE COFFEE SHOP PREFERENCE');
 })
 
