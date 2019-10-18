@@ -27,7 +27,7 @@ class CoffeeShopPreference {
     async printSavedCoffeeShopPreference() {
         if (this.savedCoffeeShop) {
             const shop = await db.getCoffeeShopPreferenceById(this.savedCoffeeShop.lastID);
-            return `${shop.name}, ${shop.location}`;
+            return shop.location ? `${shop.name}, ${shop.location}` : `${shop.name}`;
         }
 
         return "No coffee shop preferences saved."

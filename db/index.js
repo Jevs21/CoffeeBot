@@ -92,9 +92,11 @@ exports.getPreferences = (userId) => {
  * @param {string} location
  */
 exports.saveCoffeeShopPreference = (userId, name, location) => {
+    const shopLocation = location ? `"${location}"` : null;
+
     return this.runQuery(`
         INSERT INTO shop_preference (user_id, name, location)
-        VALUES ("${userId}", "${name}", "${location}")
+        VALUES ("${userId}", "${name}", ${shopLocation})
     `);
 }
 

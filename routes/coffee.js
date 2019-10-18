@@ -62,8 +62,8 @@ router.post('/shop/save', async (req, res) => {
         const name = newCoffeeShopPreference.split(',')[0].trim();
         const location = newCoffeeShopPreference.slice(name.length).replace(/[, ]+/g, " ").trim();
 
-        if (!name || !location) {
-            throw new Error("INVALID INPUT. Usage: /coffee/savecoffeeshop [name], [location]");
+        if (!name) {
+            throw new Error("INVALID INPUT. Coffee shop name required.");
         }
 
         const coffeeShopPreference = new CoffeeShopPreference(userId)
