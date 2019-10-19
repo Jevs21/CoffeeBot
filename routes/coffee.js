@@ -42,11 +42,10 @@ router.post('/preference/save', async (req, res) => {
         const newPreferences = req.body.text.split(' ');
         const size = newPreferences[0];
         const type = newPreferences[1];
-        const details = newPreferences[2];
+        const details = newPreferences.splice(2).join(' ');
 
         const preference = new CoffeePreference(userId)
         await preference.savePreferences(size, type, details);
-
 
         res.send(`Saved preference:\n ${preference.toSlackStr()}`);
     } catch (err) {
