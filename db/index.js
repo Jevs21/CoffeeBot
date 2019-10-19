@@ -28,6 +28,23 @@ exports.run = (sql) => {
 }
 
 /**
+ * Runs an SQL query on the database, and returns the result from the query.
+ * @param sql SQL query to execute
+ * @return Promise 
+ */
+exports.runQuery = (sql) => {
+    return new Promise((resolve, reject) => {
+        db.run(sql, function (err) {
+            if (err) {
+                reject(err)
+            } else {
+                resolve(this)
+            }
+        });
+    });
+}
+
+/**
  * Execute an SQL query on the database, and returns the first row.
  * @param  sql, SQL for query to execute
  * @return Result of query
@@ -64,5 +81,34 @@ exports.getPreferences = (userId) => {
         SELECT *
         FROM drink_preference
         WHERE user_id="${userId}"
+    `);
+}
+
+
+/**
+ * Save coffee shop preference
+ * @param userId
+ * @param {string} name
+ * @param {string} location
+ */
+exports.saveCoffeeShopPreference = (userId, name, location) => {
+    const shopLocation = location ? `"${location}"` : null;
+
+    return this.runQuery(`
+        INSERT INTO shop_preference (user_id, name, location)
+        VALUES ("${userId}", "${name}", ${shopLocation})
+    `);
+}
+
+
+/**
+ * Get coffee shop preference by id
+ * @param id
+ */
+exports.getCoffeeShopPreferenceById = (id) => {
+    return this.get(`
+        SELECT *
+        FROM shop_preference
+        WHERE id="${id}"
     `);
 }
