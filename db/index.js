@@ -81,6 +81,7 @@ exports.getPreferences = (userId) => {
         SELECT *
         FROM drink_preference
         WHERE user_id="${userId}"
+        SORT BY timestamp DESC
     `);
 }
 
