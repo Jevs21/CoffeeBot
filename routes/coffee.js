@@ -4,7 +4,7 @@ const db = require('../db');
 
 const router = express.Router();
 const CoffeePreference = require('../models/CoffeePreference');
-
+const CoffeeShopPreference = require('../models/CoffeeShopPreference');
 
 // coffee API routes
 router.get('/', (req, res) => {
@@ -114,11 +114,10 @@ router.post('/preference/save', async (req, res) => {
         const newPreferences = req.body.text.split(' ');
         const size = newPreferences[0];
         const type = newPreferences[1];
-        const details = newPreferences[2];
+        const details = newPreferences.splice(2).join(' ');
 
         const preference = new CoffeePreference(userId)
         await preference.savePreferences(size, type, details);
-
 
         res.send(`Saved preference:\n ${preference.toSlackStr()}`);
     } catch (err) {
@@ -127,8 +126,25 @@ router.post('/preference/save', async (req, res) => {
     }
 });
 
-router.post('/shop/save', (req, res) => {
-    res.send('SAVE COFFEE SHOP PREFERENCE');
+router.post('/shop/save', async (req, res) => {
+    try {
+        const userId = req.body.user_id;
+        const newCoffeeShopPreference = req.body.text;
+        const name = newCoffeeShopPreference.split(',')[0].trim();
+        const location = newCoffeeShopPreference.slice(name.length).replace(/[, ]+/g, " ").trim();
+
+        if (!name) {
+            throw new Error("INVALID INPUT. Coffee shop name required.");
+        }
+
+        const coffeeShopPreference = new CoffeeShopPreference(userId)
+        await coffeeShopPreference.saveCoffeeShopPreference(name, location);
+
+        res.status(200).send(`Saved coffee shop preference:\n ${await coffeeShopPreference.printSavedCoffeeShopPreference()}`);
+
+    } catch(err) {
+        res.status(400).send(err.message);
+    }
 })
 
 module.exports = router;
