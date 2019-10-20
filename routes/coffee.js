@@ -43,7 +43,7 @@ router.post('/order-:order_id/respond', (req, res) => {
  * @param Request, Response (req, res Request and response objects)
  */
 // TODO - change user's ids to names
-router.post('/display-orders', async (req, res) => {
+router.post('/orders/display', async (req, res) => {
     try {
 
         let botOutput = "";
@@ -81,14 +81,14 @@ router.post('/display-orders', async (req, res) => {
                 
                 // Get preference into output string
                 if(row.response == 1) {
-                    botOutput += "User '"+ row.user_id +"' would like a " + curPrefRow.size + " " + curPrefRow.type + " (" + curPrefRow.details + ")\n";
+                    botOutput += `User ${row.user_id} would like a ${curPrefRow.size} ${curPrefRow.type} (${curPrefRow.details})\n`;
                 } else {
-                    botOutput += "User '"+ row.user_id +"' doesn't want anything.\n";
+                    botOutput += `User ${row.user_id} doesn't want anything.\n`;
                 }
 
                 // Check to see if user is the getter
                 if(row.user_id == recentOrderGetter) {
-                    getterString = "\nUser '"+ row.user_id +"' is getting the coffee!\n";
+                    getterString = `\nUser ${row.user_id} is getting the coffee!\n`;
                 }
             }
 
@@ -103,7 +103,7 @@ router.post('/display-orders', async (req, res) => {
         res.send(botOutput);
     } catch (err) {
         console.warn(err);
-        res.status(422).send('Error in /display-orders route.');
+        res.status(422).send('Error in /orders/display route.');
     }
 });
 
