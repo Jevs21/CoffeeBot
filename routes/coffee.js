@@ -5,22 +5,45 @@ const db = require('../db');
 const router = express.Router();
 const CoffeePreference = require('../models/CoffeePreference');
 const CoffeeShopPreference = require('../models/CoffeeShopPreference');
+const slack = require('../slack');
 
 // coffee API routes
 router.get('/', (req, res) => {
     res.send('INDEX OF COFFEE API');
 });
 
-/**
- * Gets a list of coffee preferences and shop
- * preferences for a single user by id
- * @param  URI '/preferences/:id' id of user
- * @param  Request, Response (req,res  Request and response objects
- * @return Response  A JSON object listing coffee and shop preferences
- *                     
- */
-router.get('/preferences/:id', (req, res) => {
-    res.send('PREFERENCES OF A SINGLE USER');
+router.post('/preference/get', async (req, res) => {
+    try {
+        const targetName = req.body.text.split('@ ')[0];
+        //res.send(req.body.user_id);
+
+        const data = {
+            form: {
+              token: process.env.SLACK_AUTH_TOKEN
+            }
+        };
+
+        // there's no way to get a user by their username, so we have to get a list of users and find them
+        const userList = await slack.list(data, res);
+
+        res.send(`userList: ${userList}`);
+        // var targetUser;
+
+        // // looping through the list of users to find the first coordinating name (names SHOULD be unique)
+        // userList.member.forEach(member => {
+        //     if (member.name == targetName) {
+        //         targetUser = member;
+        //     }
+        // });
+
+        // targetId = targetUser.id;
+        // const targetPreferences = db.getPreferences(targetId);
+
+        // res.send(`${targetName} prefers: ${targetPreferences.toSlackStr()}`);
+    } catch (err) {
+        console.warn(err);
+        res.status(422).send("INVALID");
+    }
 });
 
 router.get('/order-:order_id', (req, res) => {
