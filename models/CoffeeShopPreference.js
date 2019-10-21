@@ -12,6 +12,23 @@ class CoffeeShopPreference {
     }
 
     /**
+     * Gets a user's preferences
+     * @param {string} userId
+     */
+    getPreferences() {
+        return db.getCoffeeShopPreference(this.userId);
+    }
+
+    /**
+     * Loads a users preferences onto the object
+     */
+    async loadPreferences() {
+        const preferences = await this.getPreferences();
+        this.name = preferences.name;
+        this.location = preferences.location;
+    }
+
+    /**
      * Saves a user's coffee shop preference
      * @param {string} name
      * @param {string} location

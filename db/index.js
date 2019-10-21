@@ -79,9 +79,13 @@ exports.all = (sql) => {
 }
 
 /**
- * 
+ * saves user drink preferences
+ * @param userId the unique slack ID associated with the user
+ * @param size the size associated with the user's drink preference
+ * @param type the type of drink the user wants e.g. coffee, tea
+ * @param details anything extra with the drink e.g. 1 milk
  */
-exports.savePreferences = (userId, size, type, details) => {
+exports.saveDrinkPreferences = (userId, size, type, details) => {
     return this.run(`
         INSERT INTO drink_preference (user_id, size, type, details)
         VALUES ("${userId}", "${size}", "${type}", "${details}")
@@ -90,9 +94,10 @@ exports.savePreferences = (userId, size, type, details) => {
 
 
 /**
- * 
+ * retrieves user drink preferences
+ * @param userId the unique slack ID associated with the user
  */
-exports.getPreferences = (userId) => {
+exports.getDrinkPreferences = (userId) => {
     return this.get(`
         SELECT *
         FROM drink_preference
@@ -119,6 +124,32 @@ exports.saveCoffeeShopPreference = (userId, name, location) => {
 
 
 /**
+ * retrieves user coffee shop preference
+ * @param userId the unique slack ID associated with the user
+ */
+exports.getCoffeeShopPreference = (userId) => {
+    return this.get(`
+        SELECT *
+        FROM shop_preference
+        WHERE user_id="${userId}"
+    `);
+}
+
+
+/**
+ * Get coffee shop preference by id
+ * @param id
+ */
+exports.getCoffeeShopPreferenceById = (id) => {
+    return this.get(`
+        SELECT *
+        FROM shop_preference
+        WHERE id="${id}"
+    `);
+}
+
+
+/**
  * SQL Query to get all responses to a specific order id
  */
 exports.getUserResponsesToOrder = (orderId) => {
@@ -139,18 +170,5 @@ exports.getMostRecentOrder = () => {
         FROM 'order'
         ORDER BY id DESC
         LIMIT 1
-    `);
-}
-
-
-/**
- * Get coffee shop preference by id
- * @param id
- */
-exports.getCoffeeShopPreferenceById = (id) => {
-    return this.get(`
-        SELECT *
-        FROM shop_preference
-        WHERE id="${id}"
     `);
 }

@@ -16,7 +16,7 @@ class CoffeePreference {
      * @param {string} userId
      */
     getPreferences() {
-        return db.getPreferences(this.userId);
+        return db.getDrinkPreferences(this.userId);
     }
 
     /**
@@ -36,7 +36,7 @@ class CoffeePreference {
      * @param {string} details
      */
     async savePreferences(size, type, details) {
-        await db.savePreferences(this.userId, size, type, details);
+        await db.saveDrinkPreferences(this.userId, size, type, details);
 
         // Refresh object preferences
         await this.loadPreferences();

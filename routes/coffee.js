@@ -16,7 +16,8 @@ router.post('/preference/get', async (req, res) => {
     try {
         const targetName = req.body.text.split(/(?:@| )+/)[1];
         if (!targetName) {
-            throw new Error("INVALID INPUT. User name required.");
+            res.send('I need a username to get preferences for! Try @<username>.');
+            throw new Error('INVALID INPUT. User name required.');
         }
 
         const data = {
@@ -26,7 +27,7 @@ router.post('/preference/get', async (req, res) => {
         // there's no way to get a user by their username, so we have to get a list of users and find them
         const response = await slack.list(data, res);
         const userList = JSON.parse(response);
-        //res.send(`userList: ${JSON.stringify(userList)}`);
+
         var targetId;
 
         // looping through the list of users to find the first coordinating name (names SHOULD be unique)
@@ -36,13 +37,22 @@ router.post('/preference/get', async (req, res) => {
             }
         });
 
-        if (!targetName) {
-            throw new Error("INVALID INPUT. User not found.");
+        if (!targetId) {
+            res.send('I couldn\'t find a user with that name!');
+            throw new Error('INVALID INPUT. User not found.');
         }
 
-        const targetPreferences = await db.getPreferences(targetId);
+        const targetDrinkPreferences = new CoffeePreference(targetId);
+        await targetDrinkPreferences.loadPreferences();
+        const targetShopPreferences = new CoffeeShopPreference(targetId);
+        await targetShopPreferences.loadPreferences();
 
-        res.send(`${targetName} prefers a ${targetPreferences.size} ${targetPreferences.type} ${targetPreferences.details} from Starbucks.`);
+        var shopPreferenceString = '';
+        if (targetShopPreferences.location) {
+            shopPreferenceString = ` from ${targetShopPreferences.name}, ${targetShopPreferences.location}`;
+        }
+
+        res.status(200).send(`${targetName} prefers a ${targetDrinkPreferences.size} ${targetDrinkPreferences.type} ${targetDrinkPreferences.details}${shopPreferenceString}.`);
     } catch (err) {
         console.warn(err);
         res.status(422).send("INVALID");
@@ -102,7 +112,7 @@ router.post('/orders/display', async (req, res) => {
         // Get preferences for all users opted-in to most recent order
         if(!error) {
             for(row of responsesRows) {
-                let curPrefRow = await db.getPreferences(row.user_id);
+                let curPrefRow = await db.getDrinkPreferences(row.user_id);
                 console.log(curPrefRow);
                 
                 // Get preference into output string
