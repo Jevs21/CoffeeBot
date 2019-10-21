@@ -9,6 +9,8 @@ const {
 
 const coffeeRouter = require('./routes/coffee');
 
+const coffeeRouter = require('./routes/coffee');
+
 // Creates express app
 const app = express();
 
@@ -24,7 +26,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Log request information
 app.use(logger);
 
-app.use(bodyParser.urlencoded({ extended: true }));
+// coffee API controller
+// All requuests will be forwarded to this router
+app.use('/coffee', coffeeRouter);
+
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 // coffee API controller
