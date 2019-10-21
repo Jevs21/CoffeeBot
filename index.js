@@ -43,4 +43,9 @@ app.post('/', (req, res) => {
   slack.postMessage(data, res);
 });
 
+
+// Print out all of the available routes
+console.log('Routes:\n',
+  coffeeRouter.stack.map(x => x.route.path))
+
 module.exports = app;

@@ -61,6 +61,22 @@ exports.get = (sql) => {
     });
 }
 
+/**
+ * Execute an SQL query on the database, and returns all rows.
+ * @param  sql, SQL for query to execute
+ * @return Result of query
+ *
+ */
+exports.all = (sql) => {
+    return new Promise ((resolve, reject) => {
+        db.all(sql, (err, rows) => {
+            if (err) {
+                reject(err);
+            }
+            resolve(rows);
+        });
+    });
+}
 
 /**
  * 
@@ -81,7 +97,7 @@ exports.getPreferences = (userId) => {
         SELECT *
         FROM drink_preference
         WHERE user_id="${userId}"
-        SORT BY timestamp DESC
+        ORDER BY created_at DESC
     `);
 }
 
@@ -98,6 +114,31 @@ exports.saveCoffeeShopPreference = (userId, name, location) => {
     return this.runQuery(`
         INSERT INTO shop_preference (user_id, name, location)
         VALUES ("${userId}", "${name}", ${shopLocation})
+    `);
+}
+
+
+/**
+ * SQL Query to get all responses to a specific order id
+ */
+exports.getUserResponsesToOrder = (orderId) => {
+    return this.all(`
+        SELECT *
+        FROM user_order
+        WHERE order_id="${orderId}"
+    `);
+}
+
+
+/**
+ * SQL Query to get the most recent order from the order table
+ */
+exports.getMostRecentOrder = () => {
+    return this.get(`
+        SELECT *
+        FROM 'order'
+        ORDER BY id DESC
+        LIMIT 1
     `);
 }
 
