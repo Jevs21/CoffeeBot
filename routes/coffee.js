@@ -16,7 +16,7 @@ router.get('/', (req, res) => {
  * preferences for a single user by id
  * @param  URI '/preferences/:id' id of user
  * @param  Request, Response (req,res  Request and response objects
- * @return Response  Slack response to the request user
+ * @return Response A JSON object listing shop preferences
  * 
  */
 router.get('/preferences/:id', (req, res) => {
