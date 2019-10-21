@@ -1,3 +1,22 @@
+# CoffeeBot
+
+## API
+
+| Route                      | Slack-Command                                  | Done?              |
+| -------------------------- | ---------------------------------------------- | ------------------ |
+| `/preferences/:id`         |                                                | :no_good:          |
+| `/order-:order_id`         |                                                | :no_good:          |
+| `/new-order`               | `/whowantscoffee`                              | :no_good:          |
+| `/order-:order_id/respond` |                                                | :no_good:          |
+| `/orders/display`          | `/displayorders`                               | :white_check_mark: |
+| `/preference/save`         | `/save-preference [size] [type] [details]`     | :white_check_mark: |
+| `/shop/save`               | `/savecoffeeshop [name] OR [name], [location]` | :white_check_mark: |
+| none                       | `/displayorder` (displays most recent order)   | :no_good:          |
+
+
+
+---
+
 ### How to Create a Slack bot using BotKit
 
 
@@ -38,13 +57,13 @@ goto [Slack API: Applications \| Slack](https://api.slack.com/apps)
 
 ## running ngrok
  `ngrok http 3000`
- 
+
  Which will create a windowed tab (don't close because it will change the randomly generated url)
  and get the https forward URL it gives you 
- 
+
  ```
  Forwarding https://570c44b0.ngrok.io -> http://localhost:3000
- ```        
+ ```
 This is the new URL where you will be able to access your server on port 3000 from outside sources. 
 
  * Then, Create a new `slash command` in the slack bot interface [Slack API: Applications \| Slack](https://api.slack.com/apps) with the `ngrok https endpoint` as the `Request URL`. 
@@ -69,9 +88,9 @@ Ensure **SQLite3** is installed.
 `npm run setup`
 
 This will generate a database.db file which is populated with empty tables with the coffee bot's schema.
+
  
- 
- 
+
  
 
 

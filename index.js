@@ -8,7 +8,7 @@ const {
 } = require('./logger');
 
 const coffeeRouter = require('./routes/coffee');
-    
+
 // Creates express app
 const app = express();
 
@@ -24,7 +24,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Log request information
 app.use(logger);
 
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // coffee API controller
@@ -42,5 +42,10 @@ app.post('/', (req, res) => {
 
   slack.postMessage(data, res);
 });
+
+
+// Print out all of the available routes
+console.log('Routes:\n',
+  coffeeRouter.stack.map(x => x.route.path))
 
 module.exports = app;
