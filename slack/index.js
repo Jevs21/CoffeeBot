@@ -15,7 +15,7 @@ exports.postMessage = (data, res) => {
 // retrieve slack users
 exports.list = (data, res) => {
     return new Promise((resolve, reject) => {
-        request.get('https://slack.com/api/users.list', data, function(error, response, body) {
+        request.get(`https://slack.com/api/users.list?token=${data.token}`, data, function(error, response, body) {
             if (error) {
                 PromiseRejectionEvent(error);
             } else {

@@ -14,32 +14,35 @@ router.get('/', (req, res) => {
 
 router.post('/preference/get', async (req, res) => {
     try {
-        const targetName = req.body.text.split('@ ')[0];
-        //res.send(req.body.user_id);
+        const targetName = req.body.text.split(/(?:@| )+/)[1];
+        if (!targetName) {
+            throw new Error("INVALID INPUT. User name required.");
+        }
 
         const data = {
-            form: {
-              token: process.env.SLACK_AUTH_TOKEN
-            }
+            token: process.env.SLACK_AUTH_TOKEN
         };
 
         // there's no way to get a user by their username, so we have to get a list of users and find them
-        const userList = await slack.list(data, res);
+        const response = await slack.list(data, res);
+        const userList = JSON.parse(response);
+        //res.send(`userList: ${JSON.stringify(userList)}`);
+        var targetId;
 
-        res.send(`userList: ${userList}`);
-        // var targetUser;
+        // looping through the list of users to find the first coordinating name (names SHOULD be unique)
+        userList.members.forEach(member => {
+            if (member.name == targetName) {
+                targetId = member.id;
+            }
+        });
 
-        // // looping through the list of users to find the first coordinating name (names SHOULD be unique)
-        // userList.member.forEach(member => {
-        //     if (member.name == targetName) {
-        //         targetUser = member;
-        //     }
-        // });
+        if (!targetName) {
+            throw new Error("INVALID INPUT. User not found.");
+        }
 
-        // targetId = targetUser.id;
-        // const targetPreferences = db.getPreferences(targetId);
+        const targetPreferences = await db.getPreferences(targetId);
 
-        // res.send(`${targetName} prefers: ${targetPreferences.toSlackStr()}`);
+        res.send(`${targetName} prefers a ${targetPreferences.size} ${targetPreferences.type} ${targetPreferences.details} from Starbucks.`);
     } catch (err) {
         console.warn(err);
         res.status(422).send("INVALID");
