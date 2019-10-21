@@ -8,9 +8,7 @@ const {
 } = require('./logger');
 
 const coffeeRouter = require('./routes/coffee');
-
-const coffeeRouter = require('./routes/coffee');
-
+    
 // Creates express app
 const app = express();
 
