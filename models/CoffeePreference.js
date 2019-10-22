@@ -16,7 +16,7 @@ class CoffeePreference {
      * @param {string} userId
      */
     getPreferences() {
-        return db.getPreferences(this.userId);
+        return db.getDrinkPreferences(this.userId);
     }
 
     /**
@@ -24,9 +24,15 @@ class CoffeePreference {
      */
     async loadPreferences() {
         const preferences = await this.getPreferences();
-        this.size = preferences.size;
-        this.type = preferences.type;
-        this.details = preferences.details;
+        if (preferences) {
+            this.size = preferences.size;
+            this.type = preferences.type;
+            this.details = preferences.details;
+        } else {
+            this.size = '';
+            this.type = '';
+            this.details = '';
+        }
     }
 
     /**
@@ -36,7 +42,7 @@ class CoffeePreference {
      * @param {string} details
      */
     async savePreferences(size, type, details) {
-        await db.savePreferences(this.userId, size, type, details);
+        await db.saveDrinkPreferences(this.userId, size, type, details);
 
         // Refresh object preferences
         await this.loadPreferences();

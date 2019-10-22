@@ -11,7 +11,8 @@ create table  if not exists shop_preference(
     id integer primary key,
     user_id integer not null,
     name text not null,
-    location text
+    location text,
+    created_at datetime default CURRENT_TIMESTAMP
 );
 
 create table  if not exists `order`(

@@ -12,12 +12,44 @@ class CoffeeShopPreference {
     }
 
     /**
+     * Gets a user's preferences
+     * @param {string} userId
+     */
+    getPreferences() {
+        return db.getCoffeeShopPreference(this.userId);
+    }
+
+    /**
+     * Loads a users preferences onto the object
+     */
+    async loadPreferences() {
+        const preferences = await this.getPreferences();
+        if (preferences) {
+            this.name = preferences.name;
+            this.location = preferences.location ? preferences.location : '';
+        } else {
+            this.name = '';
+            this.location = '';
+        }
+    }
+
+    /**
      * Saves a user's coffee shop preference
      * @param {string} name
      * @param {string} location
      */
     async saveCoffeeShopPreference(name, location) {
         this.savedCoffeeShop = await db.saveCoffeeShopPreference(this.userId, name, location);
+
+        await this.loadPreferences();
+    }
+
+    /**
+     * Returns true if any of the shop preferences have been saved
+     * @returns {boolean} If the shop preferences have been set
+     */
+    hasPreferencesSet() {
+        return this.name || this.location;
     }
 
     /**

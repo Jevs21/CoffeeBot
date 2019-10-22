@@ -4,7 +4,7 @@
 
 | Route                      | Slack-Command                                  | Done?              |
 | -------------------------- | ---------------------------------------------- | ------------------ |
-| `/preferences/:id`         |                                                | :no_good:          |
+| `/preferences/get`         | `/get-preference @[username]`                  | :white_check_mark: |
 | `/order-:order_id`         |                                                | :no_good:          |
 | `/new-order`               | `/whowantscoffee`                              | :no_good:          |
 | `/order-:order_id/respond` |                                                | :no_good:          |

@@ -5,6 +5,7 @@ const db = require('../db');
 const router = express.Router();
 const CoffeePreference = require('../models/CoffeePreference');
 const CoffeeShopPreference = require('../models/CoffeeShopPreference');
+const slack = require('../slack');
 
 // coffee API routes
 router.get('/', (req, res) => {
@@ -12,15 +13,77 @@ router.get('/', (req, res) => {
 });
 
 /**
- * Gets a list of coffee preferences and shop
- * preferences for a single user by id
- * @param  URI '/preferences/:id' id of user
- * @param  Request, Response (req,res  Request and response objects
- * @return Response A JSON object listing shop preferences
- * 
+ * POST to /preference/get that retrieves coffee and shop preferences for a given user
  */
-router.get('/preferences/:id', (req, res) => {
-    res.send('PREFERENCES OF A SINGLE USER');
+router.post('/preference/get', async (req, res) => {
+    try {
+        // parses the @ and spaces out to identify a username in the message
+        const targetName = req.body.text.split(/(?:@| )+/)[1];
+        if (!targetName) {
+            res.send('I need a username to get preferences for! Try @<username>.');
+            throw new Error('INVALID INPUT. User name required.');
+        }
+
+        const data = {
+            token: process.env.SLACK_AUTH_TOKEN
+        };
+
+        // there's no way to get a user by their username, so we have to get a list of users and find them
+        const response = await slack.list(data, res);
+        const userList = JSON.parse(response);
+
+        var targetId;
+
+        // looping through the list of users to find the first coordinating name (names SHOULD be unique)
+        userList.members.forEach(member => {
+            if (member.name == targetName) {
+                targetId = member.id;
+            }
+        });
+
+        if (!targetId) {
+            res.send('I couldn\'t find a user with that name!');
+            throw new Error('INVALID INPUT. User not found.');
+        }
+
+        var outputString = '';
+        const targetDrinkPreferences = new CoffeePreference(targetId);
+        await targetDrinkPreferences.loadPreferences();
+        const hasDrink = targetDrinkPreferences.hasPreferencesSet();
+
+        const targetShopPreferences = new CoffeeShopPreference(targetId);
+        await targetShopPreferences.loadPreferences();
+        const hasShop = targetShopPreferences.hasPreferencesSet();
+
+        if (hasDrink || hasShop) {
+            outputString = `${targetName}`;
+
+            if (hasDrink) {
+                outputString += ` prefers a ${targetDrinkPreferences.size} ${targetDrinkPreferences.type} ${targetDrinkPreferences.details}`;
+                if (hasShop) {
+                    outputString += ` and their `;
+                }
+            }
+
+            if (hasShop) {
+                if (!hasDrink) {
+                    outputString += '\'s ';
+                }
+                outputString += `favourite cafe is ${targetShopPreferences.name}`;
+
+                if (targetShopPreferences.location) {
+                    outputString += `, ${targetShopPreferences.location}`;
+                }
+            }
+        } else {
+            outputString = `${targetName} has no preferences, maybe ask them`;
+        }
+
+        res.status(200).send(`${outputString}!`);
+    } catch (err) {
+        console.warn(err);
+        res.status(422).send("INVALID");
+    }
 });
 
 router.get('/order-:order_id', (req, res) => {
@@ -76,7 +139,7 @@ router.post('/orders/display', async (req, res) => {
         // Get preferences for all users opted-in to most recent order
         if(!error) {
             for(row of responsesRows) {
-                let curPrefRow = await db.getPreferences(row.user_id);
+                let curPrefRow = await db.getDrinkPreferences(row.user_id);
                 console.log(curPrefRow);
                 
                 // Get preference into output string
