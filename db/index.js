@@ -154,16 +154,3 @@ exports.getCoffeeShopPreferenceById = (id) => {
         WHERE id="${id}"
     `);
 }
-
-
-/**
- * Get order by id
- * @param id
- */
-exports.getOrderById = (id) => {
-    return this.get(`
-        SELECT *
-        FROM 'order'
-        WHERE id=${id}
-    `);
-}
