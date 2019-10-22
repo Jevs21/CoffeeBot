@@ -24,8 +24,13 @@ class CoffeeShopPreference {
      */
     async loadPreferences() {
         const preferences = await this.getPreferences();
-        this.name = preferences.name;
-        this.location = preferences.location;
+        if (preferences) {
+            this.name = preferences.name;
+            this.location = preferences.location ? preferences.location : '';
+        } else {
+            this.name = '';
+            this.location = '';
+        }
     }
 
     /**
@@ -35,6 +40,16 @@ class CoffeeShopPreference {
      */
     async saveCoffeeShopPreference(name, location) {
         this.savedCoffeeShop = await db.saveCoffeeShopPreference(this.userId, name, location);
+
+        await this.loadPreferences();
+    }
+
+    /**
+     * Returns true if any of the shop preferences have been saved
+     * @returns {boolean} If the shop preferences have been set
+     */
+    hasPreferencesSet() {
+        return this.name || this.location;
     }
 
     /**

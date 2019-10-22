@@ -12,8 +12,12 @@ router.get('/', (req, res) => {
     res.send('INDEX OF COFFEE API');
 });
 
+/**
+ * POST to /preference/get that retrieves coffee and shop preferences for a given user
+ */
 router.post('/preference/get', async (req, res) => {
     try {
+        // parses the @ and spaces out to identify a username in the message
         const targetName = req.body.text.split(/(?:@| )+/)[1];
         if (!targetName) {
             res.send('I need a username to get preferences for! Try @<username>.');
@@ -42,17 +46,40 @@ router.post('/preference/get', async (req, res) => {
             throw new Error('INVALID INPUT. User not found.');
         }
 
+        var outputString = '';
         const targetDrinkPreferences = new CoffeePreference(targetId);
         await targetDrinkPreferences.loadPreferences();
+        const hasDrink = targetDrinkPreferences.hasPreferencesSet();
+
         const targetShopPreferences = new CoffeeShopPreference(targetId);
         await targetShopPreferences.loadPreferences();
+        const hasShop = targetShopPreferences.hasPreferencesSet();
 
-        var shopPreferenceString = '';
-        if (targetShopPreferences.location) {
-            shopPreferenceString = ` from ${targetShopPreferences.name}, ${targetShopPreferences.location}`;
+        if (hasDrink || hasShop) {
+            outputString = `${targetName}`;
+
+            if (hasDrink) {
+                outputString += ` prefers a ${targetDrinkPreferences.size} ${targetDrinkPreferences.type} ${targetDrinkPreferences.details}`;
+                if (hasShop) {
+                    outputString += ` and their `;
+                }
+            }
+
+            if (hasShop) {
+                if (!hasDrink) {
+                    outputString += '\'s ';
+                }
+                outputString += `favourite cafe is ${targetShopPreferences.name}`;
+
+                if (targetShopPreferences.location) {
+                    outputString += `, ${targetShopPreferences.location}`;
+                }
+            }
+        } else {
+            outputString = `${targetName} has no preferences, maybe ask them`;
         }
 
-        res.status(200).send(`${targetName} prefers a ${targetDrinkPreferences.size} ${targetDrinkPreferences.type} ${targetDrinkPreferences.details}${shopPreferenceString}.`);
+        res.status(200).send(`${outputString}!`);
     } catch (err) {
         console.warn(err);
         res.status(422).send("INVALID");

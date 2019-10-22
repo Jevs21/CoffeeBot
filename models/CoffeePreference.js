@@ -24,9 +24,15 @@ class CoffeePreference {
      */
     async loadPreferences() {
         const preferences = await this.getPreferences();
-        this.size = preferences.size;
-        this.type = preferences.type;
-        this.details = preferences.details;
+        if (preferences) {
+            this.size = preferences.size;
+            this.type = preferences.type;
+            this.details = preferences.details;
+        } else {
+            this.size = '';
+            this.type = '';
+            this.details = '';
+        }
     }
 
     /**
