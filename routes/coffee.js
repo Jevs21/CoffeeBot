@@ -57,7 +57,7 @@ router.post('/preference/get', async (req, res) => {
         const hasShop = targetShopPreferences.hasPreferencesSet();
 
         if (hasDrink || hasShop) {
-            outputString = `${targetName}`;
+            outputString = `<@${targetName}>`;
 
             if (hasDrink) {
                 outputString += ` prefers a ${targetDrinkPreferences.size} ${targetDrinkPreferences.type} ${targetDrinkPreferences.details}`;
