@@ -7,8 +7,12 @@
 const db = require('../db');
 
 class CoffeeShopPreference {
-    constructor(userId) {
+    constructor(userId, details=null) {
         this.userId = userId;
+        if (details) {
+            this.location = details.location;
+            this.name = details.name;
+        }
     }
 
     /**
@@ -59,10 +63,27 @@ class CoffeeShopPreference {
     async printSavedCoffeeShopPreference() {
         if (this.savedCoffeeShop) {
             const shop = await db.getCoffeeShopPreferenceById(this.savedCoffeeShop.lastID);
+
             return shop.location ? `${shop.name}, ${shop.location}` : `${shop.name}`;
         }
 
         return "No coffee shop preferences saved."
+    }
+
+    async delete() {
+        const result = await db.deleteCoffeeShopPreference(this.userId, this.name, this.location);
+        return result.changes ? 
+            `${result.changes} coffee shop${(result.changes > 1 ? 's' : '')} deleted` :
+            `No coffee shops found`;
+    }
+
+    static parseNewFromStr(str) {
+        str = str.toLowerCase();
+        const name = str.split(',')[0].trim();
+        return {
+            'name': name,
+            'location': str.slice(name.length).replace(/[, ]+/g, " ").trim()
+        }
     }
 }
 
