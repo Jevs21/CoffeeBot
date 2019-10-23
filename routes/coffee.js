@@ -135,13 +135,13 @@ router.post('/orders/display', async (req, res) => {
                 botOutput = "I ran into a problem: There are no users associated with this order!";
             }
         }
-        
+
         // Get preferences for all users opted-in to most recent order
         if(!error) {
             for(row of responsesRows) {
                 let curPrefRow = await db.getDrinkPreferences(row.user_id);
                 console.log(curPrefRow);
-                
+
                 // Get preference into output string
                 if(row.response == 1) {
                     botOutput += `User ${row.user_id} would like a ${curPrefRow.size} ${curPrefRow.type} (${curPrefRow.details})\n`;
