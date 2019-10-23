@@ -6,11 +6,29 @@ const request = require("request");
 
 // Post a message to slack
 exports.postMessage = (data, res) => {
-    return request.post('https://slack.com/api/chat.postMessage', data, function (error, response, body) {
-        // Sends welcome message
-        res.json();
+    return new Promise((resolve, reject) => {
+        request.post('https://slack.com/api/chat.postMessage', data, (err, response, body) => {
+            if (err) {
+                reject(err)
+            } else {
+                resolve(body)
+            }
+        });
     });
-} 
+}
+
+// Get messages from a Slack thread
+exports.getConversationReplies = (data, res)  => {
+    return new Promise((resolve, reject) => {
+        request.get('https://slack.com/api/conversations.replies', data, (err, response, body) => {
+            if (err) {
+                reject(err)
+            } else {
+                resolve(body)
+            }
+        });
+    });
+}
 
 // retrieve slack users
 exports.list = (data, res) => {

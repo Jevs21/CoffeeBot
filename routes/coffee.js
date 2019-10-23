@@ -5,7 +5,8 @@ const db = require('../db');
 const router = express.Router();
 const CoffeePreference = require('../models/CoffeePreference');
 const CoffeeShopPreference = require('../models/CoffeeShopPreference');
-const slack = require('../slack');
+const CoffeeOrder = require('../models/CoffeeOrder');
+const Slack = require('../slack/index');
 
 // coffee API routes
 router.get('/', (req, res) => {
@@ -29,7 +30,7 @@ router.post('/preference/get', async (req, res) => {
         };
 
         // there's no way to get a user by their username, so we have to get a list of users and find them
-        const response = await slack.list(data, res);
+        const response = await Slack.list(data, res);
         const userList = JSON.parse(response);
 
         var targetId;
@@ -90,8 +91,28 @@ router.get('/order-:order_id', (req, res) => {
     res.send('COFFEE ORDER BY ID - SEND TO USER');
 });
 
-router.post('/new-order', (req, res) => {
-    res.send('CREATE A NEW COFFEE ORDER FOR PEOPLE TO RESPOND TO');
+router.post('/order/create', async (req, res) => {
+    try {
+        const userId = req.body.user_id;
+
+        const data = {
+            form: {
+              token: process.env.SLACK_AUTH_TOKEN,
+              channel: "#bot_madness",
+              text: `Hi Kubotic! Who wants coffee? Let <@${req.body.user_name}> know by replying to this message.`
+            }
+        }
+
+        const message = await Slack.postMessage(data);
+        const messageJSON = JSON.parse(message);
+        const order = new CoffeeOrder(userId)
+        await order.createOrder(messageJSON.ts, messageJSON.channel);
+
+        res.status(200).send('New order created.');
+
+    } catch(err) {
+        res.status(400).send('INVALID INPUT');
+    }
 });
 
 router.post('/order-:order_id/respond', (req, res) => {
@@ -147,6 +168,35 @@ router.post('/orders/display', async (req, res) => {
         } else {
             recentOrderId = recentOrderRow.id;
             recentOrderGetter = recentOrderRow.coffee_getter;
+
+            // Add user responses from a coffee order
+            const data = {
+                qs: {
+                    token: process.env.SLACK_OAUTH_ACCESS_TOKEN,
+                    channel: recentOrderRow.channel_id,
+                    ts: recentOrderRow.thread_id
+                }
+            }
+
+            const messages = await Slack.getConversationReplies(data);
+            const messagesJSON = JSON.parse(messages);
+            let replyUsers;
+
+            if (messagesJSON && messagesJSON.messages && messagesJSON.messages[0]) {
+                replyUsers = messagesJSON.messages[0].reply_users;
+            }
+
+            if (replyUsers) {
+                for (let i in replyUsers) {
+                    let userOrder = await db.getUserOrder(recentOrderId, replyUsers[i]);
+
+                    // Create new user order if one has not already been made
+                    if (!userOrder) {
+                        const coffeeOrder = new CoffeeOrder(replyUsers[i]);
+                        coffeeOrder.createUserOrder(recentOrderId);
+                    }
+                }
+            }
             recentOrderDate = recentOrderRow.date;
         }
 
@@ -167,13 +217,17 @@ router.post('/orders/display', async (req, res) => {
 
             for(row of responsesRows) {
                 let curPrefRow = await db.getDrinkPreferences(row.user_id);
-                // console.log(curPrefRow);
 
-                // Get preference into output string
-                if(row.response == 1) {
-                    botOutput += `User ${row.user_id} would like a ${curPrefRow.size} ${curPrefRow.type} (${curPrefRow.details})\n`;
+                if (!curPrefRow) {
+                    botOutput += `User ${row.user_id} does not have any preferences\n`;
+
                 } else {
-                    botOutput += `User ${row.user_id} doesn't want anything.\n`;
+                    // Get preference into output string
+                    if(row.response == 1) {
+                        botOutput += `User ${row.user_id} would like a ${curPrefRow.size} ${curPrefRow.type} (${curPrefRow.details})\n`;
+                    } else {
+                        botOutput += `User ${row.user_id} doesn't want anything.\n`;
+                    }
                 }
 
                 // Check to see if user is the getter

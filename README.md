@@ -52,6 +52,7 @@ goto [Slack API: Applications \| Slack](https://api.slack.com/apps)
 
 - create a file named `.env` and copy the contents of `.env_example` to this file. And add your bots creds to the file. This gives your local bot permission to be the backend to your slack app. 
    - To get the  `SLACK_AUTH_TOKEN` credential you have to first go to the `Bot User` Tab, and add you App as a Bot User. This will allow you access the `Bot User OAuth Access Token` you need In the `Install App` tab. NOTE: This is not the `OAuth Access Token` (I made this mistake)
+   - You will also need to set the `SLACK_OAUTH_ACCESS_TOKEN` credential -- this is the `OAuth Access Token` found above `Bot User OAuth Access Token`
    
 
 

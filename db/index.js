@@ -210,11 +210,67 @@ exports.getMostRecentOrder = () => {
     `);
 }
 
+
+/**
+ * Get coffee shop preference by id
+ * @param id
+ */
+exports.getCoffeeShopPreferenceById = (id) => {
+    return this.get(`
+        SELECT *
+        FROM shop_preference
+        WHERE id="${id}"
+    `);
+}
+
+
+/**
+ * Create new order
+ * @param userId Coffee getter
+ * @param date
+ * @param threadID Slack thread ID
+ * @param channelID Slack channel ID
+ */
+exports.createNewOrder = (userId, date, threadID, channelID) => {
+    return this.run(`
+        INSERT INTO \`order\` (date, coffee_getter, thread_id, channel_id)
+        VALUES ("${date}", "${userId}", "${threadID}", "${channelID}")
+    `);
+}
+
+
+/**
+ * Get user order
+ * @param userId user ID
+ * @param orderId order ID
+ */
+exports.getUserOrder = (orderId, userId) => {
+    return this.get(`
+        SELECT *
+        FROM user_order
+        WHERE order_id="${orderId}" AND user_id="${userId}"
+    `);
+}
+
+
+/**
+ * Create new user order
+ * @param userId Coffee getter
+ * @param orderId order ID
+ */
+exports.createUserOrder = (userId, orderId) => {
+    return this.run(`
+        INSERT INTO user_order (user_id, order_id, response)
+        VALUES ("${userId}", "${orderId}", 1)
+    `);
+}
+
+
 /**
  * Get order by id
  * @param id
  */
-exports.getOrderById = (id) => {
+exports.getOrderById = (id) => {
     return this.get(`
         SELECT *
         FROM 'order'
