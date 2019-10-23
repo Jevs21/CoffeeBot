@@ -17,7 +17,9 @@ create table  if not exists shop_preference(
 
 create table  if not exists `order`(
     id integer primary key,
-    date text,
+    date datetime default CURRENT_TIMESTAMP,
+    thread_id text not null,
+    channel_id text not null,
     coffee_getter integer not null
 );
 
