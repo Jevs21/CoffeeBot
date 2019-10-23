@@ -142,6 +142,23 @@ exports.saveCoffeeShopPreference = (userId, name, location) => {
     `);
 }
 
+/**
+ * Delete coffee shop preference
+ * @param  userId   [Slack user id]
+ * @param  {string} name     [name of shop]
+ * @param  {string} location [location of shop]
+ * @return {Promise}          [db Promise result]
+ */
+exports.deleteCoffeeShopPreference = (userId, name, location) => {
+    const shopLocation = location ? `="${location}"` : null;
+    // if the user only wants to match on null
+    if (location == 'null') shopLocation = 'IS NULL';
+
+    return this.runQuery(`DELETE FROM shop_preference WHERE user_id="${userId}" 
+        AND name="${name}"
+        ${(shopLocation ? 'AND location '+shopLocation : '')}`
+    );
+}
 
 /**
  * retrieves user coffee shop preference

@@ -98,6 +98,14 @@ router.post('/order-:order_id/respond', (req, res) => {
     res.send('RESPOND AS A USER TO COFFEE ORDER');
 });
 
+router.get('/order/history', (req, res) => {
+    res.send('DISPLAY ORDER HISTORY');
+});
+
+router.get('/order/history/:user_id', (req, res) => {
+    res.send('DISPLAY ORDER HISTORY OF A SPECIFIC COFFEE GETTER');
+});
+
 /**
  * Gets the most recent order, the users who responded to the order
  * and the preferences for each of those users. Puts all this information
@@ -189,6 +197,34 @@ router.post('/preference/save', async (req, res) => {
     }
 });
 
+/**
+ * Delete a shop preference by name and location
+ * Potentially will delete more than one
+ */
+router.post('/shop/delete', async (req, res) => {
+    try {
+        const userId = req.body.user_id;
+        console.log(req.body.text);
+        if (!req.body.text) {
+            return res.send('Usage: /delete-shop [name] OR [name], [location]');
+        }
+
+        const shop = CoffeeShopPreference.parseNewFromStr(req.body.text);
+        if (!shop.name) {
+            return res.send('Usage: /delete-shop [name] OR [name], [location]');
+        }
+
+        const coffeeShopPreference = new CoffeeShopPreference(userId, shop);
+
+        // delete from the database
+        const result = await coffeeShopPreference.delete();
+        // return a friendly response
+        res.status(200).send(result);
+    } catch(err) {
+        res.status(400).send(err.message);
+    }
+});
+
 router.post('/shop/save', async (req, res) => {
     try {
         const userId = req.body.user_id;
@@ -208,6 +244,6 @@ router.post('/shop/save', async (req, res) => {
     } catch(err) {
         res.status(400).send(err.message);
     }
-})
+});
 
 module.exports = router;
