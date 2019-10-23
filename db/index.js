@@ -209,3 +209,15 @@ exports.getMostRecentOrder = () => {
         LIMIT 1
     `);
 }
+
+/**
+ * Get order by id
+ * @param id
+ */
+exports.getOrderById = (id) => {
+    return this.get(`
+        SELECT *
+        FROM 'order'
+        WHERE id=${id}
+    `);
+}
