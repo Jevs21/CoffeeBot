@@ -2,16 +2,18 @@
 
 ## API
 
-| Route                      | Slack-Command                                  | Done?              |
-| -------------------------- | ---------------------------------------------- | ------------------ |
-| `/preferences/get`         | `/get-preference @[username]`                  | :white_check_mark: |
-| `/order-:order_id`         |                                                | :no_good:          |
-| `/new-order`               | `/whowantscoffee`                              | :no_good:          |
-| `/order-:order_id/respond` |                                                | :no_good:          |
-| `/orders/display`          | `/displayorders`                               | :white_check_mark: |
-| `/preference/save`         | `/save-preference [size] [type] [details]`     | :white_check_mark: |
-| `/shop/save`               | `/savecoffeeshop [name] OR [name], [location]` | :white_check_mark: |
-| none                       | `/displayorder` (displays most recent order)   | :no_good:          |
+| Route                      | Slack-Command                                    | Done?              |
+| -------------------------- | ------------------------------------------------ | ------------------ |
+| `/preference/save`         | `/save-preference [size] [type] [details]`       | :white_check_mark: |
+| `/preferences/get`         | `/get-preference @[username]`                    | :white_check_mark: |
+| `/order-:order_id`         |                                                  | :no_good:          |
+| `/order/create`            | `/who-wants-coffee`                              | :white_check_mark: |
+| `/order-:order_id/respond` |                                                  | :no_good:          |
+| `/orders/display`          | `/display-orders`                                | :white_check_mark: |
+| `/order/history`           |                                                  | :no_good:          |
+| `/order/history/:user_id`  |                                                  | :no_good:          |
+| `/shop/save`               | `/save-coffee-shop [name] OR [name], [location]` | :white_check_mark: |
+| `/shop/delete`             | `/delete-shop [name] OR [name], [location]`      | :white_check_mark: |
 
 
 
@@ -90,8 +92,13 @@ Ensure **SQLite3** is installed.
 
 This will generate a database.db file which is populated with empty tables with the coffee bot's schema.
 
- 
-
- 
-
-
+## Adding Slack OAuth Scopes to a Bot User
+1. Go to [Slack API: Applications \| Slack](https://api.slack.com/apps) and navigate to OAuth & Permissions
+2. Ensure all of the following OAuth scopes have been added to your bot user:
+   - bot
+   - commands
+   - channels:history
+   - groups:history
+   - im:history
+   - mpim:history
+   - users:read
