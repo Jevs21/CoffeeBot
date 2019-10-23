@@ -110,45 +110,64 @@ router.get('/order/history/:user_id', (req, res) => {
  * Gets the most recent order, the users who responded to the order
  * and the preferences for each of those users. Puts all this information
  * into a string (including who is picking up the order) and outputs it
- * @param URI '/display-orders'
+ * @param URI '/orders/display'
  * @param Request, Response (req, res Request and response objects)
  */
 // TODO - change user's ids to names
 router.post('/orders/display', async (req, res) => {
+    const arg = req.body.text;
+
     try {
+        let isArg = arg != "" ? true : false;
 
         let botOutput = "";
         let getterString = ""; // A string to add to the end of the bot's output to say who is getting the order
         let error = false;
 
+        let recentOrderRow = {};
+
+        if(isArg) { // Regex to test if arg matches a single digit (order id)
+            if(/^(\d)+$/.test(arg)){
+                recentOrderRow = await db.getOrderById(arg);
+            } else {
+                error = true;
+                botOutput = `'${arg}' is an invalid argument! You must enter the id number of the desired order, or no id for the most recent order.`
+            }
+        } else {
+            recentOrderRow = await db.getMostRecentOrder();
+        }
+        
         // Get most recent order id
-        let recentOrderRow = await db.getMostRecentOrder();
         let recentOrderId = 0;
         let recentOrderGetter = 0;
-        if (!recentOrderRow){
+        let recentOrderDate = '';
+        if (!recentOrderRow && !error){
             error = true;
-            botOutput = "I ran into a problem: There are no orders!"
+            botOutput = isArg ? `There is no order with id: ${arg}` : "There are no orders in the database."
         } else {
             recentOrderId = recentOrderRow.id;
             recentOrderGetter = recentOrderRow.coffee_getter;
+            recentOrderDate = recentOrderRow.date;
         }
 
         // Get all responses to order id
         let responsesRows = [];
         if(!error) {
             responsesRows = await db.getUserResponsesToOrder(recentOrderId);
-
+            
             if(responsesRows.length == 0){
                 error = true;
-                botOutput = "I ran into a problem: There are no users associated with this order!";
+                botOutput = "There are no users associated with this order!";
             }
         }
-
+        
         // Get preferences for all users opted-in to most recent order
         if(!error) {
+            botOutput += `Coffee Order for ${recentOrderDate}\n\n`;
+
             for(row of responsesRows) {
                 let curPrefRow = await db.getDrinkPreferences(row.user_id);
-                console.log(curPrefRow);
+                // console.log(curPrefRow);
 
                 // Get preference into output string
                 if(row.response == 1) {
