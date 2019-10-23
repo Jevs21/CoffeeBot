@@ -1,6 +1,7 @@
 const sqlite3 = require('sqlite3').verbose();
 
 let db = new sqlite3.Database('database.db');
+exports.dbName = 'database.db'
 
 /**
  * @param  dbName, Name of the database to connect to
@@ -8,6 +9,7 @@ let db = new sqlite3.Database('database.db');
 exports.connect = (dbName) => {
     db.close();
     db = new sqlite3.Database(dbName)
+    this.dbName = dbName
 }
 
 /**
@@ -77,6 +79,24 @@ exports.all = (sql) => {
         });
     });
 }
+
+
+/**
+ * Clears all data in the database
+ */
+exports.clear = () => {
+    if (this.dbName === 'database.db') {
+        console.warn("I don't think you really want to do that.")
+        return;
+    }
+
+    return this.run(`
+        DELETE FROM drink_preference;
+        DELETE FROM shop_preference;
+        DELETE FROM order;
+        DELETE FROM user_order;
+    `)
+};
 
 /**
  * saves user drink preferences
