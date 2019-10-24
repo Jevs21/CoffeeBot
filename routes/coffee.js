@@ -77,7 +77,7 @@ router.post('/preference/get', async (req, res) => {
                 }
             }
         } else {
-            outputString = `${targetName} has no preferences, maybe ask them`;
+            outputString = `<@${targetName}> has no preferences, maybe ask them`;
         }
 
         res.status(200).send(`${outputString}!`);
