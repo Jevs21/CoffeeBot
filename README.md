@@ -19,21 +19,6 @@
 
 ---
 
-## Testing
-
-- Run `npm install --dev`
-- Run `npm run tests`
-
-Also:
-
-- Try running the command in slack.
-
-#### View Test Coverage
-
-```bash
-npm run coverage
-```
-
 ### How to Create a Slack bot using BotKit
 
 
@@ -86,6 +71,14 @@ This is the new URL where you will be able to access your server on port 3000 fr
 
  * Then, Create a new `slash command` in the slack bot interface [Slack API: Applications \| Slack](https://api.slack.com/apps) with the `ngrok https endpoint` as the `Request URL`. 
       * Everytime you try to complete that slash command on slack, it will automatically hit that URL.This also means you have to update the `Request URL` field on the slackbot interface every time you restart ngrok. :( 
+
+
+## Testing
+- Run `npm install --dev`
+- Run `npm run tests`
+
+Also:
+- Try running the command in slack.
 
 ## Debugging 
 - If it doesn't work you can look in 2 places for debug info 
