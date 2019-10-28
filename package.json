@@ -6,7 +6,6 @@
   "scripts": {
     "start": "nodemon index.js",
     "tests": "mocha tests/*.js --exit",
-    "coverage": "nyc npm run tests",
     "setup": "cat setup.sql | sqlite3 database.db && cat setup.sql | sqlite3 testdatabase.db"
   },
   "author": "",
@@ -25,7 +24,6 @@
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
     "mocha": "^6.2.1",
-    "nyc": "^14.1.1",
     "sinon": "^7.5.0"
   }
 }
