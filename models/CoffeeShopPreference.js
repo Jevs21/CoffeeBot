@@ -5,10 +5,11 @@
  */
 
 const db = require('../db');
+const User = require('./User')
 
 class CoffeeShopPreference {
-    constructor(userId, details=null) {
-        this.userId = userId;
+    constructor(userId, details = null) {
+        this.user = new User(userId);
         if (details) {
             this.location = details.location;
             this.name = details.name;
@@ -17,10 +18,9 @@ class CoffeeShopPreference {
 
     /**
      * Gets a user's preferences
-     * @param {string} userId
      */
     getPreferences() {
-        return db.getCoffeeShopPreference(this.userId);
+        return db.getCoffeeShopPreference(this.user.id);
     }
 
     /**
@@ -43,7 +43,7 @@ class CoffeeShopPreference {
      * @param {string} location
      */
     async saveCoffeeShopPreference(name, location) {
-        this.savedCoffeeShop = await db.saveCoffeeShopPreference(this.userId, name, location);
+        this.savedCoffeeShop = await db.saveCoffeeShopPreference(this.user.id, name, location);
 
         await this.loadPreferences();
     }
@@ -71,8 +71,8 @@ class CoffeeShopPreference {
     }
 
     async delete() {
-        const result = await db.deleteCoffeeShopPreference(this.userId, this.name, this.location);
-        return result.changes ? 
+        const result = await db.deleteCoffeeShopPreference(this.user.id, this.name, this.location);
+        return result.changes ?
             `${result.changes} coffee shop${(result.changes > 1 ? 's' : '')} deleted` :
             `No coffee shops found`;
     }

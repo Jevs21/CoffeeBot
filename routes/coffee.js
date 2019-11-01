@@ -6,6 +6,7 @@ const router = express.Router();
 const CoffeePreference = require('../models/CoffeePreference');
 const CoffeeShopPreference = require('../models/CoffeeShopPreference');
 const CoffeeOrder = require('../models/CoffeeOrder');
+const User = require('../models/User');
 const Slack = require('../slack/index');
 
 // coffee API routes
@@ -216,23 +217,24 @@ router.post('/orders/display', async (req, res) => {
             botOutput += `Coffee Order for ${recentOrderDate}\n\n`;
 
             for(row of responsesRows) {
+                const user = new User(row.user_id)
                 let curPrefRow = await db.getDrinkPreferences(row.user_id);
 
                 if (!curPrefRow) {
-                    botOutput += `User ${row.user_id} does not have any preferences\n`;
+                    botOutput += `<@${await user.getUserName()}> does not have any preferences\n`;
 
                 } else {
                     // Get preference into output string
                     if(row.response == 1) {
-                        botOutput += `User ${row.user_id} would like a ${curPrefRow.size} ${curPrefRow.type} (${curPrefRow.details})\n`;
+                        botOutput += `<@${await user.getUserName()}> would like a ${curPrefRow.size} ${curPrefRow.type} (${curPrefRow.details})\n`;
                     } else {
-                        botOutput += `User ${row.user_id} doesn't want anything.\n`;
+                        botOutput += `<@${await user.getUserName()}> doesn't want anything.\n`;
                     }
                 }
 
                 // Check to see if user is the getter
                 if(row.user_id == recentOrderGetter) {
-                    getterString = `\nUser ${row.user_id} is getting the coffee!\n`;
+                    getterString = `\n<@${await user.getUserName()}> is getting the coffee!\n`;
                 }
             }
 

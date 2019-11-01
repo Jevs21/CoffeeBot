@@ -18,7 +18,7 @@ exports.postMessage = (data, res) => {
 }
 
 // Get messages from a Slack thread
-exports.getConversationReplies = (data, res)  => {
+exports.getConversationReplies = (data, res) => {
     return new Promise((resolve, reject) => {
         request.get('https://slack.com/api/conversations.replies', data, (err, response, body) => {
             if (err) {
@@ -33,7 +33,7 @@ exports.getConversationReplies = (data, res)  => {
 // retrieve slack users
 exports.list = (data, res) => {
     return new Promise((resolve, reject) => {
-        request.get(`https://slack.com/api/users.list?token=${data.token}`, data, function(error, response, body) {
+        request.get(`https://slack.com/api/users.list?token=${data.token}`, data, function (error, response, body) {
             if (error) {
                 PromiseRejectionEvent(error);
             } else {
@@ -42,3 +42,22 @@ exports.list = (data, res) => {
         });
     });
 }
+
+
+// Get information about a user
+exports.getUserInformation = (token, userId) => {
+    return new Promise((resolve, reject) => {
+        request.get(`https://slack.com/api/users.info?token=${token}&user=${userId}`, (error, response, body) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(JSON.parse(body));
+            }
+        })
+    })
+}
+
+// Gets a user's name
+exports.getUserName = (token, userId) =>
+    this.getUserInformation(token, userId)
+        .then(resp => resp.user.name);

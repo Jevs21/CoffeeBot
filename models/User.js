@@ -1,6 +1,17 @@
-class User {
-    constructor() {
+const slack = require('./../slack');
 
+class User {
+    constructor(id) {
+        this.id = id;
+    }
+
+    /**
+     * Gets the user's username
+     */
+    getUserName() {
+        const token = process.env.SLACK_AUTH_TOKEN
+
+        return slack.getUserName(token, this.id);
     }
 
     /**

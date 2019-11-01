@@ -5,18 +5,18 @@
  */
 
 const db = require('../db');
+const User = require('./User');
 
 class CoffeePreference {
     constructor(userId) {
-        this.userId = userId;
+        this.user = new User(userId);
     }
 
     /**
      * Gets a user's preferences
-     * @param {string} userId
      */
     getPreferences() {
-        return db.getDrinkPreferences(this.userId);
+        return db.getDrinkPreferences(this.user.id);
     }
 
     /**
@@ -42,7 +42,7 @@ class CoffeePreference {
      * @param {string} details
      */
     async savePreferences(size, type, details) {
-        await db.saveDrinkPreferences(this.userId, size, type, details);
+        await db.saveDrinkPreferences(this.user.id, size, type, details);
 
         // Refresh object preferences
         await this.loadPreferences();
