@@ -31,19 +31,6 @@ app.use(bodyParser.json());
 // All requuests will be forwarded to this router
 app.use('/coffee', coffeeRouter);
 
-app.post('/', (req, res) => {
-  const data = {
-    form: {
-      token: process.env.SLACK_AUTH_TOKEN,
-      channel: "#bot_madness",
-      text: "Hi! :wave: \n I'm your new bot."
-    }
-  };
-
-  slack.postMessage(data, res);
-});
-
-
 // Print out all of the available routes
 console.log('Routes:\n',
   coffeeRouter.stack.map(x => x.route.path))
