@@ -2,18 +2,18 @@
 
 ## API
 
-| Route                      | Slack-Command                                    | Done?              |
-| -------------------------- | ------------------------------------------------ | ------------------ |
-| `/preference/save`         | `/save-preference [size] [type] [details]`       | :white_check_mark: |
-| `/preferences/get`         | `/get-preference @[username]`                    | :white_check_mark: |
-| `/order-:order_id`         |                                                  | :no_good:          |
-| `/order/create`            | `/who-wants-coffee`                              | :white_check_mark: |
-| `/order-:order_id/respond` |                                                  | :no_good:          |
-| `/orders/display`          | `/display-orders`                                | :white_check_mark: |
-| `/order/history`           |                                                  | :no_good:          |
-| `/order/history/:user_id`  |                                                  | :no_good:          |
-| `/shop/save`               | `/save-coffee-shop [name] OR [name], [location]` | :white_check_mark: |
-| `/shop/delete`             | `/delete-shop [name] OR [name], [location]`      | :white_check_mark: |
+| Route                      | Slack-Command                               | Done?              |
+| -------------------------- | ------------------------------------------- | ------------------ |
+| `/preference/save`         | `/save-preference [size] [type] [details]`  | :white_check_mark: |
+| `/preferences/get`         | `/get-preference @[username]`               | :white_check_mark: |
+| `/order-:order_id`         |                                             | :no_good:          |
+| `/order/create`            | `/who-wants-coffee`                         | :white_check_mark: |
+| `/order-:order_id/respond` |                                             | :no_good:          |
+| `/orders/display`          | `/display-orders`                           | :white_check_mark: |
+| `/order/history`           |                                             | :no_good:          |
+| `/order/history/:user_id`  |                                             | :no_good:          |
+| `/shop/save`               | `/save-shop [name] OR [name], [location]`   | :white_check_mark: |
+| `/shop/delete`             | `/delete-shop [name] OR [name], [location]` | :white_check_mark: |
 
 
 
