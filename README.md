@@ -59,6 +59,10 @@ The `package.json` contains
 
 The bot will spin up a server on `port 3000`
 
+### Docker
+```
+docker-compose up
+```
 
 #### You will have to configure the .env (dotenv) with the slack app. 
 
