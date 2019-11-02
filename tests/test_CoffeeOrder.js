@@ -11,17 +11,21 @@ const slack = require('../slack');
 chai.use(chaiHttp);
 chai.should();
 
-// Spy on our slack and db interactions
-sinon.spy(slack);
-sinon.spy(db);
-
 // Use a test database for testing
 db.connect('testdatabase.db')
 
+const sandbox = sinon.createSandbox()
+
 describe("CoffeeOrder", () => {
     beforeEach(function () {
+        sandbox.spy(slack, 'postMessage')
+        sandbox.spy(db, 'run')
         // reset the database on each run
         return db.clear();
+    });
+
+    afterEach(function () {
+        sandbox.restore()
     });
 
     describe("POST /coffee/order/create", () => {
@@ -29,7 +33,8 @@ describe("CoffeeOrder", () => {
             chai.request(app)
                 .post('/coffee/order/create')
                 .send({
-                    user_id: 1
+                    user_id: 1,
+                    user_name: "FakeTester"
                 })
                 .end((err, res) => {
                     // There should be no errors
@@ -52,7 +57,8 @@ describe("CoffeeOrder", () => {
             chai.request(app)
                 .post('/coffee/order/create')
                 .send({
-                    user_id: 1
+                    user_id: 1,
+                    user_name: 'FakeTester'
                 })
                 .end((err, res) => {
                     // There should be no errors
@@ -62,7 +68,7 @@ describe("CoffeeOrder", () => {
                     res.status.should.equal(200);
                     
                     // A query should run to save the new coffee order in the database
-                    chai.assert(db.run.calledWith(sinon.match('INSERT INTO `order`')),
+                    chai.assert(db.run.calledWith(sandbox.match('INSERT INTO `order`')),
                         "should run an insert command on the order table");
 
                     done();

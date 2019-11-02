@@ -10,19 +10,25 @@ const db = require('../db');
 chai.use(chaiHttp);
 chai.should();
 
-// Spy on our slack interactions
-sinon.spy(db);
-
 // Use a test database for testing
 db.connect('testdatabase.db')
 
-describe("CoffeePreference", () => {
-    beforeEach(function () {
-        // reset the database on each run
-        return db.clear();
-    });
+const sandbox = sinon.createSandbox()
 
+describe("CoffeePreference", () => {
     describe("POST /coffee/preference/save", () => {
+        beforeEach(function () {
+            // Spy on our slack interactions
+            sandbox.spy(db, 'run');
+
+            // reset the database on each run
+            return db.clear();
+        });
+
+        afterEach(function () {
+            sandbox.restore()
+        });
+
         // Test to get all students record
         it("should tell the user it saved the coffee preference", (done) => {
             chai.request(app)
@@ -61,7 +67,7 @@ describe("CoffeePreference", () => {
                     res.status.should.equal(200);
 
                     // A query was run to save the drink preference in the database
-                    chai.assert(db.run.calledWith(sinon.match('INSERT INTO drink_preference')),
+                    chai.assert(db.run.calledWith(sandbox.match('INSERT INTO drink_preference')),
                         "should run an insert command on the drink preference table");
 
                     done();

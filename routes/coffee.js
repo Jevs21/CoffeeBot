@@ -112,6 +112,7 @@ router.post('/order/create', async (req, res) => {
         res.status(200).send('New order created.');
 
     } catch(err) {
+        console.warn(err);
         res.status(400).send('INVALID INPUT');
     }
 });
