@@ -20,7 +20,8 @@ create table  if not exists `order`(
     date datetime default CURRENT_TIMESTAMP,
     thread_id text not null,
     channel_id text not null,
-    coffee_getter integer not null
+    coffee_getter integer not null,
+    status integer default 0
 );
 
 create table  if not exists user_order(
