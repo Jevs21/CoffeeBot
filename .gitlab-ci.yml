@@ -1,5 +1,22 @@
-image: ubuntu:18.04
+image: mattfalkner/coffeebot:latest
 
-hello-test:
+stages:
+  - test
+
+chai-test-endpoints:
+    stage: test
     script:
-      - echo "hello world"  
+      - echo "Configuring Environment"
+      - npm cache clean --force
+      - npm install
+      - npm run setup
+      - npm run tests
+
+chai-test-coverage: 
+    stage: test
+    script: 
+      - echo "Configuring Environment"
+      - npm cache clean --force
+      - npm install
+      - npm run setup
+      - npm run coverage
