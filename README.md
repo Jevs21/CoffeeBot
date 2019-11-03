@@ -15,9 +15,18 @@
 | `/shop/save`               | `/save-shop [name] OR [name], [location]`   | :white_check_mark: |
 | `/shop/delete`             | `/delete-shop [name] OR [name], [location]` | :white_check_mark: |
 
-
-
 ---
+
+## Scopes
+
+Add these scopes to your bot. (Under permissions)
+
+- `bot`
+- `commands`
+- `channels:history`
+- `im:history`
+- `mpim:history`
+- `users:read`
 
 ## Testing
 
