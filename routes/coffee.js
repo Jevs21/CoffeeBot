@@ -322,4 +322,47 @@ router.post('/shop/save', async (req, res) => {
     }
 });
 
+router.post('/shop/all', async (req, res) => {
+    try {
+        const userId = req.body.user_id;
+        const coffeeShopPreferences = new CoffeeShopPreference(userId);
+        const allShops = await coffeeShopPreferences.getAllShopPreferences();
+        let printShops = "";
+
+        if (allShops && allShops.length > 0) {
+            let prevUser = allShops[0].user_id;
+            printShops = printShops.concat(`All coffee shop preferences:`);
+
+            // Get shop preference details
+            for (let i in allShops) {
+                let currentShopPref = allShops[i];
+                let currentUser = currentShopPref.user_id;
+                const nextShopPref = allShops[parseInt(i)+1];
+
+                if (i == 0 || prevUser != currentUser) {
+                    // Get username
+                    const user = new User(currentUser)
+                    printShops = printShops.concat(`\n<@${await user.getUserName()}> prefers`);
+
+                } else {
+                    printShops = printShops.concat((nextShopPref && nextShopPref.user_id != currentUser) || !nextShopPref ? ` and` : ``);
+                }
+
+                // Get shop name and location
+                printShops = printShops.concat(` ${currentShopPref.name}`);
+                printShops = printShops.concat(currentShopPref.location ? ` (${currentShopPref.location})` : "");
+                printShops = printShops.concat(nextShopPref && nextShopPref.user_id == currentUser ? `,` : ``);
+
+                prevUser = currentUser;
+            }
+        }
+
+        res.status(200).send(printShops ? printShops : `No coffee shop preferences have been saved.`);
+
+    } catch(err) {
+        console.log(err)
+        res.status(400).send("INVALID.");
+    }
+});
+
 module.exports = router;

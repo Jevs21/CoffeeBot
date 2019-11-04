@@ -77,6 +77,10 @@ class CoffeeShopPreference {
             `No coffee shops found`;
     }
 
+    async getAllShopPreferences() {
+        return await db.getAllShopPreferences();
+    }
+
     static parseNewFromStr(str) {
         str = str.toLowerCase();
         const name = str.split(',')[0].trim();

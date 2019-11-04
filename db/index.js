@@ -277,3 +277,15 @@ exports.getOrderById = (id) => {
         WHERE id=${id}
     `);
 }
+
+
+/**
+ * Get all shop preferences ordered by user id
+ */
+exports.getAllShopPreferences = () => {
+    return this.all(`
+        SELECT *
+        FROM shop_preference
+        ORDER BY user_id
+    `);
+}
