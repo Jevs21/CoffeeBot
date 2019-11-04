@@ -20,7 +20,8 @@ create table  if not exists `order`(
     date datetime default CURRENT_TIMESTAMP,
     thread_id text not null,
     channel_id text not null,
-    coffee_getter integer not null
+    coffee_getter integer not null,
+    status integer default 0
 );
 
 create table  if not exists user_order(
@@ -28,4 +29,9 @@ create table  if not exists user_order(
     order_id integer not null,
     response integer default 0,
     foreign key(order_id) references `order`(id)
+);
+
+create table if not exists test_user(
+    user_name text,
+    user_id text
 );
