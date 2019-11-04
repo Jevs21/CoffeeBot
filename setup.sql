@@ -30,3 +30,8 @@ create table  if not exists user_order(
     response integer default 0,
     foreign key(order_id) references `order`(id)
 );
+
+create table if not exists test_user(
+    user_name text,
+    user_id text
+);

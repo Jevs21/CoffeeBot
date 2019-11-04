@@ -74,4 +74,174 @@ describe("CoffeePreference", () => {
                 });
         });
     });
+
+    /**
+     * Test cases for /preferences/get endpoint
+     */
+    describe('POST /coffee/preferences/get', () => {
+        before(function(done) {
+            Promise.all([
+                db.runQuery('INSERT INTO test_user (user_name, user_id) VALUES ("impartialuser", "1a1b1c")'),
+
+                db.runQuery('INSERT INTO test_user (user_name, user_id) VALUES ("thirstyuser", "2a2b2c")'),
+                db.saveDrinkPreferences('2a2b2c', 'Medium', 'Coffee', 'Black'),
+
+                db.runQuery('INSERT INTO test_user (user_name, user_id) VALUES ("shoppyuser", "3a3b3c")'),
+                db.saveCoffeeShopPreference('3a3b3c', 'Starbucks'),
+
+                db.runQuery('INSERT INTO test_user (user_name, user_id) VALUES ("readinguser", "4a4b4c")'),
+                db.saveCoffeeShopPreference('4a4b4c', 'Starbucks', 'McLaughlan Library'),
+
+                db.runQuery('INSERT INTO test_user (user_name, user_id) VALUES ("thirstyshoppyuser", "5a5b5c")'),
+                db.saveDrinkPreferences('5a5b5c', 'Medium', 'Coffee', 'Black'),
+                db.saveCoffeeShopPreference('5a5b5c', 'Starbucks'),
+
+                db.runQuery('INSERT INTO test_user (user_name, user_id) VALUES ("thirstyreadinguser", "6a6b6c")'),
+                db.saveDrinkPreferences('6a6b6c', 'Medium', 'Coffee', 'Black'),
+                db.saveCoffeeShopPreference('6a6b6c', 'Starbucks', 'McLaughlan Library'),
+            ]);
+            done();
+        });
+
+        after(function(done) {
+            db.clear();
+
+            done();
+        });
+
+        // no input, error handling
+        it ('should be a usage message', (done) => {
+            chai.request(app)
+                .post('/coffee/preference/get')
+                .send({
+                    text: ''
+                })
+                .end((err, res) => {
+                    chai.expect(err).to.be.null;
+                    res.status.should.equal(200);
+                    chai.assert.include(res.text, 'I need a username to get preferences for! Try @<username>.');
+                    done();
+                });
+        });
+
+        // no user found, error handling
+        it ('should be informing the user does not exist', (done) => {
+            chai.request(app)
+                .post('/coffee/preference/get')
+                .send({
+                    text: '@nonuser'
+                })
+                .end((err, res) => {
+                    chai.expect(err).to.be.null;
+                    res.status.should.equal(200);
+                    chai.assert.include(res.text, 'I couldn\'t find a user with that name!');
+                    done();
+                });
+        });
+
+        // no preferences found, error handling
+        it ('should be informing the user that user has no preferences', (done) => {
+            chai.request(app)
+                .post('/coffee/preference/get')
+                .send({
+                    text: '@impartialuser'
+                })
+                .end((err, res) => {
+                    chai.expect(err).to.be.null;
+                    res.status.should.equal(200);
+                    chai.assert.include(res.text, '<@impartialuser> has no preferences, maybe ask them!');
+                    done();
+                });
+        });
+
+        // drink preferences found
+        it ('should be informing the user of the user\'s drink preferences', (done) => {
+            chai.request(app)
+                .post('/coffee/preference/get')
+                .send({
+                    text: '@thirstyuser'
+                })
+                .end((err, res) => {
+                    chai.expect(err).to.be.null;
+                    res.status.should.equal(200);
+                    chai.assert.include(res.text, '<@thirstyuser> prefers a Medium Coffee Black!');
+                    done();
+                });
+        });
+
+        // shop preferences found without location
+        it ('should be informing the user of the user\'s cafe preferences', (done) => {
+            chai.request(app)
+                .post('/coffee/preference/get')
+                .send({
+                    text: '@shoppyuser'
+                })
+                .end((err, res) => {
+                    chai.expect(err).to.be.null;
+                    res.status.should.equal(200);
+                    chai.assert.include(res.text, '<@shoppyuser>\'s favourite cafe is Starbucks!');
+                    done();
+                });
+        });
+
+        // shop preferences found with location
+        it ('should be informing the user of the user\'s cafe preferences', (done) => {
+            chai.request(app)
+                .post('/coffee/preference/get')
+                .send({
+                    text: '@readinguser'
+                })
+                .end((err, res) => {
+                    chai.expect(err).to.be.null;
+                    res.status.should.equal(200);
+                    chai.assert.include(res.text, '<@readinguser>\'s favourite cafe is Starbucks, McLaughlan Library!');
+                    done();
+                });
+        });
+
+        // drink preferences found with cafe name, no location
+        it ('should be informing the user of the user\'s drink and cafe preferences', (done) => {
+            chai.request(app)
+                .post('/coffee/preference/get')
+                .send({
+                    text: '@thirstyshoppyuser'
+                })
+                .end((err, res) => {
+                    chai.expect(err).to.be.null;
+                    res.status.should.equal(200);
+                    chai.assert.include(res.text, '<@thirstyshoppyuser> prefers a Medium Coffee Black and their favourite cafe is Starbucks!');
+                    done();
+                });
+        });
+
+        // drink preferences found with cafe name and location
+        it ('should be informing the user of the user\'s drink and cafe preferences', (done) => {
+            chai.request(app)
+                .post('/coffee/preference/get')
+                .send({
+                    text: '@thirstyreadinguser'
+                })
+                .end((err, res) => {
+                    chai.expect(err).to.be.null;
+                    res.status.should.equal(200);
+                    chai.assert.include(res.text, '<@thirstyreadinguser> prefers a Medium Coffee Black and their favourite cafe is Starbucks, McLaughlan Library!');
+                    done();
+                });
+        });
+
+        // invalid input, expected behaviour
+        it ('should be ignoring the nonsense and printing a valid response', (done) => {
+            chai.request(app)
+                .post('/coffee/preference/get')
+                .send({
+                    text: '@thirstyreadinguser nonsense nonsense nonsense @thirstyuser'
+                })
+                .end((err, res) => {
+                    chai.expect(err).to.be.null;
+                    res.status.should.equal(200);
+                    chai.assert.include(res.text, '<@thirstyreadinguser> prefers a Medium Coffee Black and their favourite cafe is Starbucks, McLaughlan Library!');
+                    done();
+                });
+        });
+    });
 });
