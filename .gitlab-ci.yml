@@ -3,20 +3,23 @@ image: mattfalkner/coffeebot:latest
 stages:
   - test
 
-chai-test-endpoints:
-    stage: test
-    script:
-      - echo "Configuring Environment"
-      - npm cache clean --force
-      - npm install
-      - npm run setup
-      - npm run tests
+tests:
+  stage: test
+  script:
+    - echo "Configuring Environment"
+    - npm cache clean --force
+    - npm install
+    - npm run setup
+    - npm run tests
 
-chai-test-coverage: 
-    stage: test
-    script: 
-      - echo "Configuring Environment"
-      - npm cache clean --force
-      - npm install
-      - npm run setup
-      - npm run coverage
+test-coverage:
+  stage: test
+  script:
+    - echo "Configuring Environment"
+    - npm cache clean --force
+    - npm install
+    - npm run setup
+    - npm run coverage
+  artifacts:
+    paths:
+      - coverage/

@@ -1,3 +1,6 @@
+![coverage](https://gitlab.socs.uoguelph.ca/kubotic/coffeebot/badges/master/coverage.svg?job=test-coverage)
+
+
 # CoffeeBot
 
 ## API
