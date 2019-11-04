@@ -23,65 +23,50 @@ router.post('/preference/get', async (req, res) => {
         const targetName = req.body.text.split(/(?:@| )+/)[1];
         if (!targetName) {
             res.send('I need a username to get preferences for! Try @<username>.');
-            throw new Error('INVALID INPUT. User name required.');
-        }
-
-        const data = {
-            token: process.env.SLACK_AUTH_TOKEN
-        };
-
-        // there's no way to get a user by their username, so we have to get a list of users and find them
-        const response = await Slack.list(data, res);
-        const userList = JSON.parse(response);
-
-        var targetId;
-
-        // looping through the list of users to find the first coordinating name (names SHOULD be unique)
-        userList.members.forEach(member => {
-            if (member.name == targetName) {
-                targetId = member.id;
-            }
-        });
-
-        if (!targetId) {
-            res.send('I couldn\'t find a user with that name!');
-            throw new Error('INVALID INPUT. User not found.');
-        }
-
-        var outputString = '';
-        const targetDrinkPreferences = new CoffeePreference(targetId);
-        await targetDrinkPreferences.loadPreferences();
-        const hasDrink = targetDrinkPreferences.hasPreferencesSet();
-
-        const targetShopPreferences = new CoffeeShopPreference(targetId);
-        await targetShopPreferences.loadPreferences();
-        const hasShop = targetShopPreferences.hasPreferencesSet();
-
-        if (hasDrink || hasShop) {
-            outputString = `<@${targetName}>`;
-
-            if (hasDrink) {
-                outputString += ` prefers a ${targetDrinkPreferences.size} ${targetDrinkPreferences.type} ${targetDrinkPreferences.details}`;
-                if (hasShop) {
-                    outputString += ` and their `;
-                }
-            }
-
-            if (hasShop) {
-                if (!hasDrink) {
-                    outputString += '\'s ';
-                }
-                outputString += `favourite cafe is ${targetShopPreferences.name}`;
-
-                if (targetShopPreferences.location) {
-                    outputString += `, ${targetShopPreferences.location}`;
-                }
-            }
         } else {
-            outputString = `<@${targetName}> has no preferences, maybe ask them`;
-        }
+            const targetUser = new User(null, targetName);
+            await targetUser.lookupIdByUserName();
 
-        res.status(200).send(`${outputString}!`);
+            targetId = targetUser.getId();
+            if (!targetId) {
+                res.send('I couldn\'t find a user with that name!');
+            } else {
+                var outputString = '';
+                const targetDrinkPreferences = new CoffeePreference(targetId);
+                await targetDrinkPreferences.loadPreferences();
+                const hasDrink = targetDrinkPreferences.hasPreferencesSet();
+
+                const targetShopPreferences = new CoffeeShopPreference(targetId);
+                await targetShopPreferences.loadPreferences();
+                const hasShop = targetShopPreferences.hasPreferencesSet();
+
+                if (hasDrink || hasShop) {
+                    outputString = `<@${targetName}>`;
+
+                    if (hasDrink) {
+                        outputString += ` prefers a ${targetDrinkPreferences.size} ${targetDrinkPreferences.type} ${targetDrinkPreferences.details}`;
+                        if (hasShop) {
+                            outputString += ` and their `;
+                        }
+                    }
+
+                    if (hasShop) {
+                        if (!hasDrink) {
+                            outputString += '\'s ';
+                        }
+                        outputString += `favourite cafe is ${targetShopPreferences.name}`;
+
+                        if (targetShopPreferences.location) {
+                            outputString += `, ${targetShopPreferences.location}`;
+                        }
+                    }
+                } else {
+                    outputString = `<@${targetName}> has no preferences, maybe ask them`;
+                }
+
+                res.send(`${outputString}!`);
+            }
+        }
     } catch (err) {
         console.warn(err);
         res.status(422).send("INVALID");

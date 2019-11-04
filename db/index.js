@@ -90,13 +90,22 @@ exports.clear = () => {
         return;
     }
 
-    return this.run(`
-        DELETE FROM drink_preference;
-        DELETE FROM shop_preference;
-        DELETE FROM order;
-        DELETE FROM user_order;
-    `)
+    return Promise.all([
+        this.run('DELETE FROM drink_preference;'),
+        this.run('DELETE FROM shop_preference;'),
+        this.run('DELETE FROM user_order;'),
+        this.run(`DELETE FROM 'order';`),
+        this.run('DELETE FROM test_user;'),
+    ]);
 };
+
+exports.getTestUserId = (username) => {
+    return this.get(`
+        SELECT user_id
+        FROM test_user
+        WHERE user_name="${username}"
+    `);
+}
 
 /**
  * saves user drink preferences
