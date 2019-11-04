@@ -360,7 +360,6 @@ router.post('/shop/all', async (req, res) => {
         res.status(200).send(printShops ? printShops : `No coffee shop preferences have been saved.`);
 
     } catch(err) {
-        console.log(err)
         res.status(400).send("INVALID.");
     }
 });
