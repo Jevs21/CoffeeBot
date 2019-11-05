@@ -267,7 +267,7 @@ exports.getUserOrder = (orderId, userId) => {
  * @param userId Coffee getter
  * @param orderId order ID
  */
-exports.createUserOrder = (userId, orderId) => {
+exports.createUserOrderResponse = (userId, orderId) => {
     return this.run(`
         INSERT INTO user_order (user_id, order_id, response)
         VALUES ("${userId}", "${orderId}", 1)
@@ -276,17 +276,29 @@ exports.createUserOrder = (userId, orderId) => {
 
 
 /**
- * Get order by id
- * @param id
+ * Get order by thread id
+ * @param threadId
  */
-exports.getOrderById = (id) => {
+exports.getOrderByThreadId = (threadId) => {
     return this.get(`
         SELECT *
         FROM 'order'
-        WHERE id=${id}
+        WHERE thread_id='${threadId}'
     `);
 }
 
+/**
+ * Get order by date
+ * @param date
+ */
+exports.getOrderByDate = (date) => {
+    return this.get(`
+        SELECT *
+        FROM 'order'
+        WHERE date > '${date} 00:00:01'
+        AND date < '${date} 23:59:59'
+    `);
+}
 
 /**
  * Get all shop preferences ordered by user id
