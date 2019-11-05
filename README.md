@@ -17,6 +17,7 @@
 | `/order/history/:user_id`  |                                             | :no_good:          |
 | `/shop/save`               | `/save-shop [name] OR [name], [location]`   | :white_check_mark: |
 | `/shop/delete`             | `/delete-shop [name] OR [name], [location]` | :white_check_mark: |
+| `/shop/all`                | `/display-all-shops`                        | :white_check_mark: |
 
 ---
 
