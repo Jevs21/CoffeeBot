@@ -73,8 +73,8 @@ class User {
      * @param  String response      A valid response to the order
      * @return Boolean              True on success, False on failure
      */
-    respond(order, response) {
-
+    respond(order) {
+        db.createUserOrderResponse(this.id, order);
     }
 }
 

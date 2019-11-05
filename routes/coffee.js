@@ -123,108 +123,96 @@ router.get('/order/history/:user_id', (req, res) => {
  */
 // TODO - change user's ids to names
 router.post('/orders/display', async (req, res) => {
-    const arg = req.body.text;
+
+    let dateStrArg = req.body.text;
+    const channel_id = req.body.channel_id;
+    const user_id = req.body.user_id;
 
     try {
-        let isArg = arg != "" ? true : false;
+        let error = false;
 
         let botOutput = "";
         let getterString = ""; // A string to add to the end of the bot's output to say who is getting the order
-        let error = false;
+        
+        const order = new CoffeeOrder(user_id);
 
         let recentOrderRow = {};
 
-        if(isArg) { // Regex to test if arg matches a single digit (order id)
-            if(/^(\d)+$/.test(arg)){
-                recentOrderRow = await db.getOrderById(arg);
-            } else {
+        if(dateStrArg) {
+            dateStrArg = order.createDateStr(dateStrArg);
+            
+            if(dateStrArg == null) { // Invalid date string provided
                 error = true;
-                botOutput = `'${arg}' is an invalid argument! You must enter the id number of the desired order, or no id for the most recent order.`
+                botOutput = `'${req.body.text}' is an invalid argument! You must enter the date of the desired order [YYYY-MM-DD].`;
+            } else {
+                recentOrderRow = await order.getOrder(dateStrArg); // dateStr is either valid (YYYY-MM-DD)
             }
         } else {
-            recentOrderRow = await db.getMostRecentOrder();
+            recentOrderRow = await order.getOrder(); // getting most recent
         }
         
         // Get most recent order id
-        let recentOrderId = 0;
-        let recentOrderGetter = 0;
-        let recentOrderDate = '';
-        if (!recentOrderRow && !error){
-            error = true;
-            botOutput = isArg ? `There is no order with id: ${arg}` : "There are no orders in the database."
-        } else {
-            recentOrderId = recentOrderRow.id;
-            recentOrderGetter = recentOrderRow.coffee_getter;
-
-            // Add user responses from a coffee order
-            const data = {
-                qs: {
-                    token: process.env.SLACK_OAUTH_ACCESS_TOKEN,
-                    channel: recentOrderRow.channel_id,
-                    ts: recentOrderRow.thread_id
-                }
-            }
-
-            const messages = await Slack.getConversationReplies(data);
-            const messagesJSON = JSON.parse(messages);
-            let replyUsers;
-
-            if (messagesJSON && messagesJSON.messages && messagesJSON.messages[0]) {
-                replyUsers = messagesJSON.messages[0].reply_users;
-            }
-
-            if (replyUsers) {
-                for (let i in replyUsers) {
-                    let userOrder = await db.getUserOrder(recentOrderId, replyUsers[i]);
-
-                    // Create new user order if one has not already been made
-                    if (!userOrder) {
-                        const coffeeOrder = new CoffeeOrder(replyUsers[i]);
-                        coffeeOrder.createUserOrder(recentOrderId);
-                    }
-                }
-            }
-            recentOrderDate = recentOrderRow.date;
-        }
-
-        // Get all responses to order id
-        let responsesRows = [];
+        let orderId = 0;
+        let orderGetter = 0;
+        let orderDate = '';
         if(!error) {
-            responsesRows = await db.getUserResponsesToOrder(recentOrderId);
-            
-            if(responsesRows.length == 0){
+            if(!recentOrderRow) {
+                // Checks to see if a date was provided for the error message
                 error = true;
-                botOutput = "There are no users associated with this order!";
-            }
-        }
-        
-        // Get preferences for all users opted-in to most recent order
-        if(!error) {
-            botOutput += `Coffee Order for ${recentOrderDate}\n\n`;
+                botOutput = (req.body.text) ? `There was no order on ${dateStrArg}` : "There are no orders in the database.";
+            } else {
+                // Add user responses from a coffee order
+                orderId = recentOrderRow.id;
+                orderGetter = recentOrderRow.coffee_getter;
+                orderDate = recentOrderRow.date;
 
-            for(row of responsesRows) {
-                const user = new User(row.user_id)
-                let curPrefRow = await db.getDrinkPreferences(row.user_id);
-
-                if (!curPrefRow) {
-                    botOutput += `<@${await user.getUserName()}> does not have any preferences\n`;
-
-                } else {
-                    // Get preference into output string
-                    if(row.response == 1) {
-                        botOutput += `<@${await user.getUserName()}> would like a ${curPrefRow.size} ${curPrefRow.type} (${curPrefRow.details})\n`;
-                    } else {
-                        botOutput += `<@${await user.getUserName()}> doesn't want anything.\n`;
+                const data = {
+                    qs: {
+                        token: process.env.SLACK_OAUTH_ACCESS_TOKEN,
+                        channel: recentOrderRow.channel_id,
+                        ts: recentOrderRow.thread_id
                     }
                 }
 
-                // Check to see if user is the getter
-                if(row.user_id == recentOrderGetter) {
-                    getterString = `\n<@${await user.getUserName()}> is getting the coffee!\n`;
+                const messages = await Slack.getConversationReplies(data);
+                const messagesJSON = JSON.parse(messages);
+                let replyUsers;
+
+                if (messagesJSON && messagesJSON.messages && messagesJSON.messages[0]) {
+                    replyUsers = messagesJSON.messages[0].reply_users;
+                }
+                if (replyUsers) {
+                    // START FORMATTING THE OUTPUT STRING
+
+                    botOutput += `Coffee Order for ${orderDate}\n\n`;
+
+                    for (let curUserId of replyUsers) {
+                        let curUser = new User(curUserId);
+                        let curUserPref = new CoffeePreference(curUserId);
+                        await curUserPref.loadPreferences();
+                        const hasDrink = curUserPref.hasPreferencesSet();
+
+                        if (hasDrink) {
+                            botOutput += `<@${await curUser.getUserName()}>: ${curUserPref.size} ${curUserPref.type} ${curUserPref.details}\n`;
+                        } else {
+                            botOutput += `<@${await curUser.getUserName()}>: has no preferences!\n`;
+                        }
+
+                        // Users have responses to orders, we assign orders to the user in the db
+                        curUser.respond(orderId);
+
+                        // Check to see if user is the getter
+                        if(curUserId == orderGetter) {
+                            getterString = `\n<@${await curUser.getUserName()}> is getting the coffee!\n`;
+                        }
+                    }
+
+                    botOutput += getterString
+                }
+                else {
+                    botOutput = `There are no users in this order!`;
                 }
             }
-
-            botOutput += getterString;
         }
 
         // Check then send string.

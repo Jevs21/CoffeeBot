@@ -15,7 +15,7 @@ class CoffeePreference {
     /**
      * Gets a user's preferences
      */
-    getPreferences() {
+    async getPreferences() {
         return db.getDrinkPreferences(this.user.id);
     }
 
