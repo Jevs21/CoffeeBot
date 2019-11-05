@@ -6,9 +6,7 @@ After=network.target
 User=root
 Group=www-data
 WorkingDirectory=/root/bots/coffeebot
-ExecStart=/bin/bash -c "docker-compose up"
+ExecStart=/bin/bash -c "npm install && npm run setup && node index.js"
 
 [Install]
 WantedBy=multi-user.target
-
-
