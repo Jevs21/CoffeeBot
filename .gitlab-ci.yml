@@ -1,7 +1,16 @@
 image: mattfalkner/coffeebot:latest
 
 stages:
+  - lint
   - test
+
+eslint:
+  stage: lint
+  allow_failure: true
+  script:
+    - npm i eslint eslint-config-airbnb
+    - npx install-peerdeps eslint-config-airbnb
+    - npm run lint
 
 tests:
   stage: test

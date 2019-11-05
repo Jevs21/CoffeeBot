@@ -1,5 +1,6 @@
 ![coverage](https://gitlab.socs.uoguelph.ca/kubotic/coffeebot/badges/master/coverage.svg?job=test-coverage)
-
+![pipeline](https://gitlab.socs.uoguelph.ca/kubotic/coffeebot/badges/master/pipeline.svg)
+![Code style: airbnb](https://img.shields.io/badge/code%20style-airbnb-blue.svg?style=flat-square)
 
 # CoffeeBot
 
