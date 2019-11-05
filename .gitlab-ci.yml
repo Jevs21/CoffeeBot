@@ -3,6 +3,7 @@ image: mattfalkner/coffeebot:latest
 stages:
   - lint
   - test
+  - deploy
 
 eslint:
   stage: lint
@@ -32,3 +33,27 @@ test-coverage:
   artifacts:
     paths:
       - coverage/
+
+
+deploy_staging: 
+  stage: deploy 
+  only:
+    - master
+  environment: 
+    name: staging 
+    url: https://www.falkner.ca:3000
+  script: 
+    - apt-get install -qq git
+    - echo "$RELEASE_IMAGE"
+    - 'which ssh-agent || ( apk --update add openssh-client )'
+    - eval $(ssh-agent -s)
+    - mkdir -p ~/.ssh
+    - echo "$PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - echo "$PUBLIC_KEY" | tr -d '\r' > ~/.ssh/id_rsa.pub
+    - chmod 700 ~/.ssh/id_rsa
+    - eval "$(ssh-agent -s)"
+    - ssh-add ~/.ssh/id_rsa
+    - ssh-keyscan -H '172.105.29.199' >> ~/.ssh/known_hosts
+    - ssh-keyscan 172.105.29.199 | sort -u - ~/.ssh/known_hosts -o ~/.ssh/known_hosts
+    - '[[ -f /.dockerinit ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    - ssh -A root@172.105.29.199 "cd /root/bots/coffeebot && git checkout master && git pull origin master && systemctl restart coffeebot && journalctl -u coffeebot && exit"
