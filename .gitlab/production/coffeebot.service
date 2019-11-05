@@ -1,0 +1,14 @@
+[Unit]
+Description=Coffee Bot for Slack
+After=network.target
+
+[Service]
+User=root
+Group=www-data
+WorkingDirectory=/root/bots/coffeebot
+ExecStart=/bin/bash -c "docker-compose up"
+
+[Install]
+WantedBy=multi-user.target
+
+
