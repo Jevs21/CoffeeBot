@@ -27,6 +27,19 @@ describe('CoffeeShopPreference', () => {
     sandbox.restore()
   });
 
+  // Test CoffeeShopPreference constructor
+  describe("new CoffeeShopPreference", () => {
+    it("should return a new CoffeOrder object", (done) => {
+      const userId = 'User1';
+      const order = new CoffeeShopPreference(userId);
+
+      order.userId.should.equal(userId, "should set the id internally");
+
+      done();
+    });
+  });
+
+  // Test CoffeeShopPreference.getAllShopPreferences
   describe('getAllShopPreferences', () => {
     it('should get a list of shop preferences have been saved', (done) => {
       // Stub for db
