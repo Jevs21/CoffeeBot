@@ -41,7 +41,7 @@ describe('CoffeeShopPreference', () => {
 
   // Test CoffeeShopPreference.getAllShopPreferences
   describe('getAllShopPreferences', () => {
-    it('should get a list of shop preferences have been saved', (done) => {
+    it('should get a list of all shop preferences that have been saved', (done) => {
       // Stub for db
       const getAllShopPrefsRes = [{
         id: 1,
@@ -61,6 +61,47 @@ describe('CoffeeShopPreference', () => {
       chai.assert(fakeGetAllShopPreferences.calledOnce, 'should call database once');
 
       chai.assert.becomes(allShopPrefsResult, getAllShopPrefsRes, 'the getAllShopPreferences promise resolves to the expected list of shop preferences');
+      
+      done();
+    });
+  });
+
+  // Test CoffeeShopPreference.getPreferences
+  describe("getPreferences", () => {
+    it("should get a coffee shop preference saved by a user", (done) => {
+      const getShopPrefsRes = {
+        id: 1,
+        user_id: 'User2',
+        name: 'Second Cup',
+        location: '213 Sesame St',
+        created_at: '2020-01-10 16:20:00'
+      };
+      const fakeGetPreferences = sinon.fake.resolves(getShopPrefsRes);
+      sinon.replace(db, 'getCoffeeShopPreference', fakeGetPreferences);
+
+      const userId = 'User1';
+      const coffeeShopPreference = new CoffeeShopPreference(userId);
+      coffeeShopPreference.user.id.should.equal(userId, 'should set the id internally');
+
+      const shopPrefResult = coffeeShopPreference.getPreferences();
+      chai.assert(fakeGetPreferences.calledOnce, 'should call database once');
+
+      chai.assert.becomes(shopPrefResult, getShopPrefsRes, 'the getPreferences promise resolves to the expected shop preference');
+      
+      done();
+    });
+  });
+
+  // Test CoffeeShopPreference.printSavedCoffeeShopPreference
+  describe("printSavedCoffeeShopPreference", () => {
+    it("should inform the user that no coffee shop preference has been saved", (done) => {
+      const userId = 'User1';
+      const coffeeShopPreference = new CoffeeShopPreference(userId);
+      coffeeShopPreference.user.id.should.equal(userId, 'should set the id internally');
+
+      const savedCoffeeShopPreference = coffeeShopPreference.printSavedCoffeeShopPreference();
+      chai.assert.becomes(savedCoffeeShopPreference, "No coffee shop preferences saved.", 'should return a message indicating no coffee shop preference saved');
+
       done();
     });
   });
