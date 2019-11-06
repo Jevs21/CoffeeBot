@@ -31,9 +31,9 @@ describe('CoffeeShopPreference', () => {
   describe("new CoffeeShopPreference", () => {
     it("should return a new CoffeOrder object", (done) => {
       const userId = 'User1';
-      const order = new CoffeeShopPreference(userId);
+      const coffeeShopPreference = new CoffeeShopPreference(userId);
 
-      order.userId.should.equal(userId, "should set the id internally");
+      coffeeShopPreference.user.id.should.equal(userId, "should set the id internally");
 
       done();
     });
