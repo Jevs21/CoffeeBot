@@ -29,7 +29,7 @@ describe('CoffeeShopPreference', () => {
 
   // Test CoffeeShopPreference constructor
   describe("new CoffeeShopPreference", () => {
-    it("should return a new CoffeOrder object", (done) => {
+    it("should return a new CoffeeShopPreference object", (done) => {
       const userId = 'User1';
       const coffeeShopPreference = new CoffeeShopPreference(userId);
 
