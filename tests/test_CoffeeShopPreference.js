@@ -79,7 +79,7 @@ describe('CoffeeShopPreference', () => {
       const fakeGetPreferences = sinon.fake.resolves(getShopPrefsRes);
       sinon.replace(db, 'getCoffeeShopPreference', fakeGetPreferences);
 
-      const userId = 'User1';
+      const userId = 'User2';
       const coffeeShopPreference = new CoffeeShopPreference(userId);
       coffeeShopPreference.user.id.should.equal(userId, 'should set the id internally');
 
@@ -102,6 +102,60 @@ describe('CoffeeShopPreference', () => {
       const savedCoffeeShopPreference = coffeeShopPreference.printSavedCoffeeShopPreference();
       chai.assert.becomes(savedCoffeeShopPreference, "No coffee shop preferences saved.", 'should return a message indicating no coffee shop preference saved');
 
+      done();
+    });
+  });
+
+  // Test CoffeeShopPreference.parseNewFromStr
+  describe("parseNewFromStr", () => {
+    it("should parse coffee shop preference string correctly", (done) => {
+      const shopPreference = {
+        name: 'second cup',
+        location: '213 sesame st'
+      };
+
+      const parsedShopPreference = CoffeeShopPreference.parseNewFromStr("Second Cup, 213 Sesame St");
+      parsedShopPreference.name.should.equal(shopPreference.name, 'should correctly parse coffee shop name');
+      parsedShopPreference.location.should.equal(shopPreference.location, 'should correctly parse coffee shop location');
+
+      done();
+    });
+  });
+
+  // Test CoffeeShopPreference.delete
+  describe("delete", () => {
+    it("should inform the user that no coffee shop preferences were found", (done) => {
+      const deleteShopPrefRes = {
+        user_id: 'User2',
+        name: 'Second Cup',
+        location: '213 Sesame St'
+      };
+      const fakeDeleteShopPreference = sinon.fake.resolves(deleteShopPrefRes);
+      sinon.replace(db, 'deleteCoffeeShopPreference', fakeDeleteShopPreference);
+
+      const userId = 'User2';
+      const coffeeShopPreference = new CoffeeShopPreference(userId);
+      coffeeShopPreference.user.id.should.equal(userId, 'should set the id internally');
+
+      const shopPrefResult = coffeeShopPreference.delete();
+      chai.assert(fakeDeleteShopPreference.calledOnce, 'should call database once');
+
+      chai.assert.becomes(shopPrefResult, 'No coffee shops found', 'the getPreferences promise resolves to the expected shop preference');
+      
+      done();
+    });
+  });
+
+  // Test CoffeeShopPreference.hasPreferencesSet
+  describe("hasPreferencesSet", () => {
+    it("should return undefined indicating a coffee shop preference was not set", (done) => {
+      const userId = 'User1';
+      const coffeeShopPreference = new CoffeeShopPreference(userId);
+      coffeeShopPreference.user.id.should.equal(userId, 'should set the id internally');
+
+      const isShopPrefSet = coffeeShopPreference.hasPreferencesSet();
+      chai.expect(isShopPrefSet).to.be.undefined;
+      
       done();
     });
   });
