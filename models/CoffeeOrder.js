@@ -27,12 +27,11 @@ class CoffeeOrder {
      *                If null, return the most recent order.
      */
   async getOrder(dateStr = null) {
-    if (dateStr) {
-      console.log('getting by date.');
+    if(dateStr) {
       return db.getOrderByDate(dateStr);
+    } else {
+      return db.getMostRecentOrder();
     }
-    console.log('getting by recent.');
-    return db.getMostRecentOrder();
   }
 
   /**
@@ -72,9 +71,10 @@ class CoffeeOrder {
     await db.createUserOrder(this.userId, orderId);
   }
 
-  toSlackStr() {
-
-  }
+    toSlackStr() {
+        // Not implemented
+        return '';
+    }
 }
 
 module.exports = CoffeeOrder;

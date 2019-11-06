@@ -79,16 +79,86 @@ describe('CoffeeOrder', () => {
     });
   });
 
-  describe('getOrder', () => {
-    it('should get the most recent order, when no argument is provided', (done) => {
+  // Test CoffeeOrder constructor
+  describe("new CoffeeOrder", () => {
+    it("should return a new CoffeOrder object", (done) => {
+      const userId = '123ABC';
+      const order = new CoffeeOrder(userId);
+
+      order.userId.should.equal(userId, "should set the id internally");
+
+      done();
+    });
+  });
+
+  // Test CoffeeOrder.createDateStr
+  describe("createDateStr", () => {
+    it("should reject any string not 10 characters long", (done) => {
+      const userId = '123ABC';
+      const order = new CoffeeOrder(userId);
+
+      const str = '2019-1-10';
+
+      const result = order.createDateStr(str);
+
+      (result == null).should.be.true;
+
+      done();
+    });
+
+    it("should return identical string if valid", (done) => {
+      const userId = '123ABC';
+      const order = new CoffeeOrder(userId);
+
+      const str = '2019-01-10';
+
+      const result = order.createDateStr(str);
+
+      result.should.equal(str, "should return identical string if valid");
+
+      done();
+    });
+
+    it("should change a string from YYYY/MM/DD format to YYYY-MM-DD format", (done) => {
+      const userId = '123ABC';
+      const order = new CoffeeOrder(userId);
+
+      const str = '2019/01/10';
+      const correctRet = '2019-01-10';
+
+      const result = order.createDateStr(str);
+
+      result.should.equal(correctRet, "should return the same date in a valid string format");
+
+      done();
+    });
+
+    it("should change a string from YYYY MM DD format to YYYY-MM-DD format", (done) => {
+      const userId = '123ABC';
+      const order = new CoffeeOrder(userId);
+
+      const str = '2019 01 10';
+      const correctRet = '2019-01-10';
+
+      const result = order.createDateStr(str);
+
+      result.should.equal(correctRet, "should return the same date in a valid string format");
+
+      done();
+    });
+  });
+
+  // Test CoffeeOrder.getOrder with and without argument
+  describe("getOrder", () => {
+    it("should get the most recent order, when no argument is provided", (done) => {
       // Stub for db
       const getMostRecentOrderRes = {
         id: 123,
         date: '2020-01-10 16:20:00',
         thread_id: 'TID123',
         channel_id: 'CID123',
-        coffee_getter: 3,
-      };
+        coffee_getter: 3
+      }
       fakeGetRecentOrder = sinon.fake.resolves(getMostRecentOrderRes);
       sinon.replace(db, 'getMostRecentOrder', fakeGetRecentOrder);
 
@@ -127,7 +197,22 @@ describe('CoffeeOrder', () => {
       const orderResult = order.getOrder(anyDate);
       chai.assert(fakeGetOrderByDate.calledOnce, 'should call database once');
 
-      chai.assert.becomes(orderResult, getOrderByDateRes, 'the getOrderByDate promise resolves to the expected order');
+      chai.assert.becomes(orderResult, getOrderByDateRes, "the getOrderByDate promise resolves to the expected order");
+      done();
+    });
+  });
+
+  // Test CoffeeOrder.toSlackStr
+  describe("toSlackStr", () => {
+    it("should return an empty string (feature not in use)", (done) => {
+      const uId = '123ABC';
+      const order = new CoffeeOrder(uId);
+
+      order.userId.should.equal(uId, "should set the id internally");
+
+      const str = order.toSlackStr();
+
+      str.should.equal("", "should return an empty string");
       done();
     });
   });
