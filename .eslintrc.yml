@@ -1,2 +1,5 @@
 extends:
-   - "airbnb"
+  - "airbnb"
+
+rules:
+  indent: 2
