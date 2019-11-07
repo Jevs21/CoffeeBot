@@ -85,7 +85,7 @@ router.post('/order/create', async (req, res) => {
       form: {
         token: process.env.SLACK_AUTH_TOKEN,
         channel: '#bot_madness',
-        text: `Hi Kubotic! Who wants coffee? Let <@${req.body.user_name}> know by replying to this message.`,
+        text: `Hi Judi! Who wants coffee? Let <@${req.body.user_name}> know by replying to this message.`,
       },
     };
 
