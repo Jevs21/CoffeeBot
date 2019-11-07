@@ -26,10 +26,13 @@ describe('User', () => {
 
       user.id.should.equal(userId, 'should set the id internally');
 
+      const preCallCount = fakeGetUserName.callCount;
       const userNameResult = user.getUserName();
-      chai.assert(fakeGetUserName.calledOnce, 'should call slack once');
+      const postCallCount = fakeGetUserName.callCount;
 
-      chai.assert.include(slack.getUserName.getCall(0).args[1], userId, 'should pass the userId to slack');
+      chai.assert((postCallCount - preCallCount == 1), 'should call slack once');
+
+      chai.assert.include(slack.getUserName.getCall(preCallCount).args[1], userId, 'should pass the userId to slack');
 
       chai.assert.becomes(userNameResult, realUserName, 'the getUserName promise resolves to the expected username');
 
