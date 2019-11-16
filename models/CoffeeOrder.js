@@ -60,15 +60,7 @@ class CoffeeOrder {
      * @param userId the user you want the response of
      */
   async getUserOrder(orderId, userId) {
-    await db.getUserOrder(orderId, userId);
-  }
-
-  /**
-     * Creates a new user order
-     * @param orderId order ID
-     */
-  async createUserOrder(orderId) {
-    await db.createUserOrder(this.userId, orderId);
+    return await db.getUserOrder(orderId, userId);
   }
 
     toSlackStr() {

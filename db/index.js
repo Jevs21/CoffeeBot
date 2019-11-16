@@ -145,7 +145,7 @@ exports.saveCoffeeShopPreference = (userId, name, location) => {
  * @return {Promise}          [db Promise result]
  */
 exports.deleteCoffeeShopPreference = (userId, name, location) => {
-  const shopLocation = location ? `="${location}"` : null;
+  let shopLocation = location ? `="${location}"` : null;
   // if the user only wants to match on null
   if (location == 'null') shopLocation = 'IS NULL';
 

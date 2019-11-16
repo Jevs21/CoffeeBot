@@ -190,6 +190,7 @@ describe('CoffeeBot Routes', () => {
             db.run(`INSERT INTO drink_preference (user_id, size, type, details) VALUES ('456', 'large', 'mocha', 'testing')`);
             db.run(`INSERT INTO drink_preference (user_id, size, type, details) VALUES ('789', 'large', 'mocha', 'testing')`);
 
+            db.run(`INSERT INTO 'order' (thread_id, channel_id, coffee_getter, date) VALUES ('TID000', 'CID000', '13456', '2019-11-16 18:07:29')`);
             const preCallCount = fakeGetConversationReplies.callCount;
 
             chai.request(app)
@@ -209,10 +210,8 @@ describe('CoffeeBot Routes', () => {
 
                 chai.assert((postCallCount - preCallCount == 1), 'should call getConversationReplies once');
         
-                chai.assert(slack.getConversationReplies.calledOnce, 'should call getConversationReplies once');
-
                 // Slack message should display preferences of the order
-                res.text.should.equal(`Coffee Order for 2020-01-10 16:20:00\n\n<@Bobby>: large mocha testing\n<@Bobby>: large mocha testing\n<@Bobby>: large mocha testing\n`);
+                res.text.should.equal(`Coffee Order for 2019-11-16 18:07:29\n\n<@Bobby>: large mocha testing\n<@Bobby>: large mocha testing\n<@Bobby>: large mocha testing\n`);
         
                 done();
             });
@@ -229,6 +228,8 @@ describe('CoffeeBot Routes', () => {
             db.run(`INSERT INTO drink_preference (user_id, size, type, details) VALUES ('456', 'large', 'mocha', 'testing')`);
             db.run(`INSERT INTO drink_preference (user_id, size, type, details) VALUES ('789', 'large', 'mocha', 'testing')`);
 
+            db.run(`INSERT INTO 'order' (thread_id, channel_id, coffee_getter, date) VALUES ('TID000', 'CID000', '13456', '2019-01-10 18:07:29')`);
+
             const preCallCount = fakeGetConversationReplies.callCount;
 
             chai.request(app)
@@ -236,7 +237,7 @@ describe('CoffeeBot Routes', () => {
             .send({
               user_id: 1,
               user_name: 'FakeTester',
-              text: '2020-01-10'
+              text: '2019-01-10'
             })
             .end((err, res) => {
                 // There should be no errors
@@ -250,7 +251,7 @@ describe('CoffeeBot Routes', () => {
                 chai.assert((postCallCount - preCallCount == 1), 'should call getConversationReplies once');
 
                 // Slack message should display preferences of the order
-                res.text.should.equal(`Coffee Order for 2020-01-10 16:20:00\n\n<@Bobby>: large mocha testing\n<@Bobby>: large mocha testing\n<@Bobby>: large mocha testing\n`);
+                res.text.should.equal(`Coffee Order for 2019-01-10 18:07:29\n\n<@Bobby>: large mocha testing\n<@Bobby>: large mocha testing\n<@Bobby>: large mocha testing\n`);
         
                 done();
             });
