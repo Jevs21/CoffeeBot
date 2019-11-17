@@ -13,17 +13,21 @@ class CoffeePreference {
   }
 
   /**
-     * Gets a user's preferences
+     * Gets a user's preferences by their id
+     * @param {integer} id
      */
-  async getPreferences() {
-    return db.getDrinkPreferences(this.user.id);
+  static async get(id) {
+    const preference = new CoffeePreference(id);
+    await preference.load();
+    return preference;
   }
+
 
   /**
      * Loads a users preferences onto the object
      */
-  async loadPreferences() {
-    const preferences = await this.getPreferences();
+  async load() {
+    const preferences = await db.getDrinkPreferences(this.user.id);
     if (preferences) {
       this.size = preferences.size;
       this.type = preferences.type;
@@ -41,11 +45,11 @@ class CoffeePreference {
      * @param {string} type
      * @param {string} details
      */
-  async savePreferences(size, type, details) {
+  async save(size, type, details) {
     await db.saveDrinkPreferences(this.user.id, size, type, details);
 
     // Refresh object preferences
-    await this.loadPreferences();
+    await this.load();
   }
 
   /**
@@ -60,11 +64,13 @@ class CoffeePreference {
      * Writes the preferences in a pretty slack format
      */
   toSlackStr() {
+    let str = '';
     if (this.hasPreferencesSet()) {
-      return `Size: ${this.size}\nType: ${this.type}\nDetails: ${this.details}`;
+      str = `Size: ${this.size}\nType: ${this.type}\nDetails: ${this.details}`;
+    } else {
+      str = 'No preferences saved.'
     }
-
-    return 'No preferences saved.';
+    return str;
   }
 }
 

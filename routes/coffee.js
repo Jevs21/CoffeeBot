@@ -32,8 +32,7 @@ router.post('/preference/get', async (req, res) => {
         res.send('I couldn\'t find a user with that name!');
       } else {
         let outputString = '';
-        const targetDrinkPreferences = new CoffeePreference(targetId);
-        await targetDrinkPreferences.loadPreferences();
+        const targetDrinkPreferences = await CoffeePreference.get(targetId);
         const hasDrink = targetDrinkPreferences.hasPreferencesSet();
 
         const targetShopPreferences = new CoffeeShopPreference(targetId);
@@ -85,7 +84,7 @@ router.post('/order/create', async (req, res) => {
       form: {
         token: process.env.SLACK_AUTH_TOKEN,
         channel: '#bot_madness',
-        text: `Hi Judi! Who wants coffee? Let <@${req.body.user_name}> know by replying to this message.`,
+        text: `Hi everyone! Who wants coffee? Let <@${req.body.user_name}> know by replying to this message.`,
       },
     };
 
@@ -186,8 +185,7 @@ router.post('/orders/display', async (req, res) => {
 
           for (const curUserId of replyUsers) {
             const curUser = new User(curUserId);
-            const curUserPref = new CoffeePreference(curUserId);
-            await curUserPref.loadPreferences();
+            const curUserPref = await CoffeePreference.get(curUserId);
             const hasDrink = curUserPref.hasPreferencesSet();
 
             if (hasDrink) {
@@ -234,7 +232,7 @@ router.post('/preference/save', async (req, res) => {
     const details = newPreferences.splice(2).join(' ');
 
     const preference = new CoffeePreference(userId);
-    await preference.savePreferences(size, type, details);
+    await preference.save(size, type, details);
 
     res.send(`Saved preference:\n ${preference.toSlackStr()}`);
   } catch (err) {
