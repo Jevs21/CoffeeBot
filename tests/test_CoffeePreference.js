@@ -5,6 +5,7 @@ const sinon = require('sinon');
 
 const app = require('..');
 const db = require('../db');
+const CoffeePreference = require('../models/CoffeePreference');
 
 // Configure chai
 chai.use(chaiHttp);
@@ -244,6 +245,38 @@ describe('CoffeePreference', () => {
           chai.assert.include(res.text, '<@thirstyreadinguser> prefers a Medium Coffee Black and their favourite cafe is Starbucks, McLaughlan Library!');
           done();
         });
+    });
+  });
+
+  describe('Model tests', () => {
+    describe("toSlackStr()", () => {
+      it("should return the correct string representation", () => {
+        const uID = 'UID123';
+        const cp = new CoffeePreference(uID);
+
+        cp.size = 'small';
+        cp.type = 'coffee';
+        cp.details = 'black';
+
+        const result = cp.toSlackStr();
+
+        chai.assert(
+          result.should.equal(`Size: small\nType: coffee\nDetails: black`),
+          'should return the correct string representation of the object'
+        );
+      });
+
+      it("should return the default string for no preferences set.", () => {
+        const uID = 'UID123';
+        const cp = new CoffeePreference(uID);
+
+        const result = cp.toSlackStr();
+
+        chai.assert(
+          result.should.equal('No preferences saved.'),
+          'should return the correct string representation of the object'
+        );
+      });
     });
   });
 });

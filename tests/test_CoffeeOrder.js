@@ -110,7 +110,7 @@ describe('CoffeeOrder', () => {
         coffee_getter: 3
       }
       fakeGetRecentOrder = sinon.fake.resolves(getMostRecentOrderRes);
-      sinon.replace(db, 'getMostRecentOrder', fakeGetRecentOrder);
+      sinon.stub(db, 'getMostRecentOrder').callsFake(fakeGetRecentOrder);
 
       const userId = '123ABC';
       const order = new CoffeeOrder(userId);
@@ -122,6 +122,8 @@ describe('CoffeeOrder', () => {
 
       chai.assert.becomes(orderResult, getMostRecentOrderRes, 'the getRecentOrder promise resolves to the expected order');
 
+      db.getMostRecentOrder.restore(); 
+      
       done();
     });
 
@@ -137,7 +139,7 @@ describe('CoffeeOrder', () => {
         coffee_getter: 3,
       };
       fakeGetOrderByDate = sinon.fake.resolves(getOrderByDateRes);
-      sinon.replace(db, 'getOrderByDate', fakeGetOrderByDate);
+      sinon.stub(db, 'getOrderByDate').callsFake(fakeGetOrderByDate);
 
       const userId = '123ABC';
       const order = new CoffeeOrder(userId);
@@ -148,7 +150,33 @@ describe('CoffeeOrder', () => {
       chai.assert(fakeGetOrderByDate.calledOnce, 'should call database once');
 
       chai.assert.becomes(orderResult, getOrderByDateRes, "the getOrderByDate promise resolves to the expected order");
+      
+      db.getOrderByDate.restore();
+      
       done();
+    });
+  });
+
+  // Test CoffeeOrder.getUserOrder
+  describe("getUserOrder", () => {
+    it("should return a user's order response", async () => {
+      const uID = 'UID123';
+      const oID = 'OID123';
+      const resp = 1;
+
+      const order = new CoffeeOrder(uID);
+
+      await db.run(`INSERT INTO user_order (user_id, order_id, response) VALUES ('UID111', 'OID000', ${resp})`);
+      await db.run(`INSERT INTO user_order (user_id, order_id, response) VALUES ('${uID}', 'OID000', 0)`);
+      await db.run(`INSERT INTO user_order (user_id, order_id, response) VALUES ('${uID}', '${oID}', ${resp})`);
+      await db.run(`INSERT INTO user_order (user_id, order_id, response) VALUES ('UID000', '${oID}', ${resp})`);
+      await db.run(`INSERT INTO user_order (user_id, order_id, response) VALUES ('${uID}', 'OID444', 0)`);
+      
+      let orderResp = await order.getUserOrder(oID, uID);
+
+      orderResp.user_id.should.equal(uID);
+      orderResp.order_id.should.equal(oID);
+      orderResp.response.should.equal(resp);
     });
   });
 
